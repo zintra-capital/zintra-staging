@@ -1,0 +1,1209 @@
+{
+  "funds": {
+    "triana": {
+      "aum": {
+        "real": 57.7,
+        "budget": 62.2,
+        "acReal": 58.848,
+        "mesReal": -1.305,
+        "acBudg": 64.191,
+        "mesBudg": -1.989,
+        "varEur": -5.343,
+        "varPct": -8.3
+      },
+      "ingresos": {
+        "acReal": 217.751,
+        "mesReal": 43.647,
+        "ytdReal": 261.4,
+        "acBudg": 209.212,
+        "mesBudg": 54.164,
+        "ytdBudg": 263.4,
+        "varEur": 8.539,
+        "varPct": 4.1
+      },
+      "gastos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingNetos": {
+        "acReal": 217.751,
+        "mesReal": 43.647,
+        "ytdReal": 261.4,
+        "acBudg": 209.212,
+        "mesBudg": 54.164,
+        "ytdBudg": 263.4,
+        "varEur": 8.539,
+        "varPct": 4.1
+      },
+      "tir": 11.2,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    },
+    "alcantara": {
+      "aum": {
+        "real": 79.4,
+        "budget": 102.3,
+        "acReal": 82.048,
+        "mesReal": -1.908,
+        "acBudg": 90.775,
+        "mesBudg": 11.519,
+        "varEur": -8.727,
+        "varPct": -9.6
+      },
+      "ingresos": {
+        "acReal": 743.438,
+        "mesReal": 190.0,
+        "ytdReal": 933.4,
+        "acBudg": 1018.171,
+        "mesBudg": 355.147,
+        "ytdBudg": 1373.3,
+        "varEur": -274.733,
+        "varPct": -27.0
+      },
+      "gastos": {
+        "acReal": -99.225,
+        "mesReal": -25.0,
+        "ytdReal": 124.2,
+        "acBudg": -230.225,
+        "mesBudg": -81.046,
+        "ytdBudg": 311.3,
+        "varEur": 131.0,
+        "varPct": 56.9
+      },
+      "ingNetos": {
+        "acReal": 644.213,
+        "mesReal": 165.0,
+        "ytdReal": 809.2,
+        "acBudg": 787.946,
+        "mesBudg": 274.101,
+        "ytdBudg": 1062.0,
+        "varEur": -143.733,
+        "varPct": -18.2
+      },
+      "tir": 9.8,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    },
+    "ronda": {
+      "aum": {
+        "real": 55.0,
+        "budget": 70.4,
+        "acReal": 49.579,
+        "mesReal": 5.421,
+        "acBudg": 65.221,
+        "mesBudg": 5.225,
+        "varEur": -15.642,
+        "varPct": -24.0
+      },
+      "ingresos": {
+        "acReal": 234.217,
+        "mesReal": 65.362,
+        "ytdReal": 299.6,
+        "acBudg": 357.21,
+        "mesBudg": 110.917,
+        "ytdBudg": 468.1,
+        "varEur": -122.993,
+        "varPct": -34.4
+      },
+      "gastos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingNetos": {
+        "acReal": 234.217,
+        "mesReal": 65.362,
+        "ytdReal": 299.6,
+        "acBudg": 357.21,
+        "mesBudg": 110.917,
+        "ytdBudg": 468.1,
+        "varEur": -122.993,
+        "varPct": -34.4
+      },
+      "tir": 10.1,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    },
+    "alameda": {
+      "aum": {
+        "real": 16.3,
+        "budget": 54.6,
+        "acReal": 5.7,
+        "mesReal": 10.6,
+        "acBudg": 49.648,
+        "mesBudg": 4.935,
+        "varEur": -43.948,
+        "varPct": -88.5
+      },
+      "ingresos": {
+        "acReal": 18.999,
+        "mesReal": 5.0,
+        "ytdReal": 24.0,
+        "acBudg": 512.433,
+        "mesBudg": 161.138,
+        "ytdBudg": 134.7,
+        "varEur": -493.434,
+        "varPct": -96.3
+      },
+      "gastos": {
+        "acReal": -14.688,
+        "mesReal": -3.025,
+        "ytdReal": 17.7,
+        "acBudg": -192.96,
+        "mesBudg": -54.44,
+        "ytdBudg": 0.0,
+        "varEur": 178.272,
+        "varPct": 92.4
+      },
+      "ingNetos": {
+        "acReal": 4.311,
+        "mesReal": 1.975,
+        "ytdReal": 6.3,
+        "acBudg": 319.473,
+        "mesBudg": 106.698,
+        "ytdBudg": 134.7,
+        "varEur": -315.162,
+        "varPct": -98.7
+      },
+      "tir": 13.1,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    },
+    "vera": {
+      "aum": {
+        "real": 0.0,
+        "budget": 0.0,
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingresos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "gastos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingNetos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "tir": 10.1,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    },
+    "belmonte": {
+      "aum": {
+        "real": 0.0,
+        "budget": 0.0,
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingresos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 200.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 200.0,
+        "varEur": -200.0,
+        "varPct": -100.0
+      },
+      "gastos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 0.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 0.0,
+        "varEur": 0.0,
+        "varPct": 0.0
+      },
+      "ingNetos": {
+        "acReal": 0.0,
+        "mesReal": 0.0,
+        "ytdReal": 0.0,
+        "acBudg": 200.0,
+        "mesBudg": 0.0,
+        "ytdBudg": 200.0,
+        "varEur": -200.0,
+        "varPct": -100.0
+      },
+      "tir": null,
+      "tirNeta": null,
+      "moic": null,
+      "dpi": null,
+      "pipeline": []
+    }
+  },
+  "triana_loans": [
+    {
+      "issuer": "Imenergy Power Plant, S.L.",
+      "orig": 5000000,
+      "curr": 3125000,
+      "maturity": "13/05/2028",
+      "sector": "Ingeniería",
+      "region": "Madrid",
+      "ratingEth": "B+",
+      "ratingCurr": "B+",
+      "nextPay": 76824,
+      "capDue": 0,
+      "intDue": 76824
+    },
+    {
+      "issuer": "One Shot Equity, S.L.",
+      "orig": 3000000,
+      "curr": 1920000,
+      "maturity": "16/05/2028",
+      "sector": "Hostelería",
+      "region": "Madrid",
+      "ratingEth": "B",
+      "ratingCurr": "B-",
+      "nextPay": 229812,
+      "capDue": 180000,
+      "intDue": 49812
+    },
+    {
+      "issuer": "Transnugon, S.L.",
+      "orig": 2500000,
+      "curr": 1125000,
+      "maturity": "16/05/2028",
+      "sector": "Logística",
+      "region": "Valencia",
+      "ratingEth": "B",
+      "ratingCurr": "B-",
+      "nextPay": 153619,
+      "capDue": 125000,
+      "intDue": 28619
+    },
+    {
+      "issuer": "Hemisferio Verde, S.L.",
+      "orig": 2570000,
+      "curr": 2544300,
+      "maturity": "16/06/2028",
+      "sector": "Distribución",
+      "region": "Catalonia",
+      "ratingEth": "B+",
+      "ratingCurr": "BB-",
+      "nextPay": 90968,
+      "capDue": 25700,
+      "intDue": 65268
+    },
+    {
+      "issuer": "Riba Mundo Tecnología, S.L.",
+      "orig": 6212500,
+      "curr": 3937500,
+      "maturity": "11/07/2028",
+      "sector": "Distribución",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "D",
+      "nextPay": 540216,
+      "capDue": 437500,
+      "intDue": 102716
+    },
+    {
+      "issuer": "Gold Center Capital S.L.",
+      "orig": 4000000,
+      "curr": 2250000,
+      "maturity": "11/07/2028",
+      "sector": "Distribución",
+      "region": "Madrid",
+      "ratingEth": "B",
+      "ratingCurr": "BB-",
+      "nextPay": 306989,
+      "capDue": 250000,
+      "intDue": 56989
+    },
+    {
+      "issuer": "Envialia World S.L.",
+      "orig": 10000000,
+      "curr": 10000000,
+      "maturity": "08/08/2028",
+      "sector": "Logística",
+      "region": "Madrid",
+      "ratingEth": "BB-",
+      "ratingCurr": "BB-",
+      "nextPay": 1235850,
+      "capDue": 1000000,
+      "intDue": 235850
+    },
+    {
+      "issuer": "Dial Partners S.L.",
+      "orig": 3500000,
+      "curr": 1750000,
+      "maturity": "17/10/2028",
+      "sector": "Construcción",
+      "region": "Galicia",
+      "ratingEth": "B+",
+      "ratingCurr": "BB-",
+      "nextPay": 222523,
+      "capDue": 175000,
+      "intDue": 47523
+    },
+    {
+      "issuer": "Agropecuaria Santas Masas S.L.",
+      "orig": 4000000,
+      "curr": 2700000,
+      "maturity": "31/10/2028",
+      "sector": "Agroalimentario",
+      "region": "Aragon",
+      "ratingEth": "B",
+      "ratingCurr": "B-",
+      "nextPay": 321760,
+      "capDue": 250000,
+      "intDue": 71760
+    },
+    {
+      "issuer": "Dental Company Center S.L.",
+      "orig": 2000000,
+      "curr": 2000000,
+      "maturity": "14/11/2027",
+      "sector": "Salud",
+      "region": "Andalucia",
+      "ratingEth": "BB-",
+      "ratingCurr": "BB-",
+      "nextPay": 170500,
+      "capDue": 0,
+      "intDue": 170500
+    },
+    {
+      "issuer": "Dental Company Center S.L.",
+      "orig": 5000000,
+      "curr": 4500000,
+      "maturity": "14/11/2027",
+      "sector": "Salud",
+      "region": "Andalucia",
+      "ratingEth": "BB-",
+      "ratingCurr": "BB-",
+      "nextPay": 170500,
+      "capDue": 0,
+      "intDue": 170500
+    },
+    {
+      "issuer": "Riba Mundo Tecnología, S.L.",
+      "orig": 2662500,
+      "curr": 1687500,
+      "maturity": "11/07/2028",
+      "sector": "Distribución",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "D",
+      "nextPay": 231521,
+      "capDue": 187500,
+      "intDue": 44021
+    },
+    {
+      "issuer": "Grupo Lantania S.L.",
+      "orig": 2500000,
+      "curr": 2500000,
+      "maturity": "01/12/2027",
+      "sector": "Construcción",
+      "region": "Madrid",
+      "ratingEth": "BB",
+      "ratingCurr": "BB-",
+      "nextPay": 55693,
+      "capDue": 0,
+      "intDue": 55693
+    },
+    {
+      "issuer": "Gold Center, S.L.",
+      "orig": 1500000,
+      "curr": 937500,
+      "maturity": "11/10/2028",
+      "sector": "Distribución",
+      "region": "Madrid",
+      "ratingEth": "B+",
+      "ratingCurr": "BB-",
+      "nextPay": 117140,
+      "capDue": 93750,
+      "intDue": 23390
+    },
+    {
+      "issuer": "Bodegas BH S.L.",
+      "orig": 2000000,
+      "curr": 1475000,
+      "maturity": "05/01/2029",
+      "sector": "Agroalimentario",
+      "region": "Extremadura",
+      "ratingEth": "B+",
+      "ratingCurr": "B+",
+      "nextPay": 160875,
+      "capDue": 125000,
+      "intDue": 35875
+    },
+    {
+      "issuer": "ARCESSO DYNAMICS, S.L.",
+      "orig": 2500000,
+      "curr": 484800,
+      "maturity": "20/01/2029",
+      "sector": "Industrial",
+      "region": "Catalonia",
+      "ratingEth": "B",
+      "ratingCurr": "CCC",
+      "nextPay": 13472,
+      "capDue": 0,
+      "intDue": 13472
+    },
+    {
+      "issuer": "Sondeos, Estructuras y Geotecnia S…",
+      "orig": 3000000,
+      "curr": 2212500,
+      "maturity": "20/01/2029",
+      "sector": "Ingeniería",
+      "region": "Madrid",
+      "ratingEth": "B+",
+      "ratingCurr": "B+",
+      "nextPay": 246184,
+      "capDue": 187500,
+      "intDue": 58684
+    },
+    {
+      "issuer": "Agro Indes S.L.",
+      "orig": 1379000,
+      "curr": 879000,
+      "maturity": "25/01/2029",
+      "sector": "Distribución",
+      "region": "Navarra",
+      "ratingEth": "B+",
+      "ratingCurr": "CCC+",
+      "nextPay": 19761,
+      "capDue": 0,
+      "intDue": 19761
+    },
+    {
+      "issuer": "Agro Indes S.L.",
+      "orig": 1595360,
+      "curr": 595360,
+      "maturity": "25/01/2029",
+      "sector": "Distribución",
+      "region": "Navarra",
+      "ratingEth": "B+",
+      "ratingCurr": "CCC+",
+      "nextPay": 19761,
+      "capDue": 0,
+      "intDue": 19761
+    },
+    {
+      "issuer": "Opentix S.L. (EUR 2M Loan)",
+      "orig": 2000000,
+      "curr": 2000000,
+      "maturity": "24/01/2028",
+      "sector": "Tecnología",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "B+",
+      "nextPay": 84135,
+      "capDue": 0,
+      "intDue": 84135
+    },
+    {
+      "issuer": "Opentix S.L. (EUR 1,12M Loan)",
+      "orig": 1120000,
+      "curr": 1120000,
+      "maturity": "24/01/2028",
+      "sector": "Tecnología",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "B+",
+      "nextPay": 84135,
+      "capDue": 0,
+      "intDue": 84135
+    },
+    {
+      "issuer": "Mirai Advisory S.L.",
+      "orig": 3000000,
+      "curr": 2980000,
+      "maturity": "02/02/2029",
+      "sector": "Tecnología",
+      "region": "Madrid",
+      "ratingEth": "B+",
+      "ratingCurr": "BB-",
+      "nextPay": 92827,
+      "capDue": 20000,
+      "intDue": 72827
+    },
+    {
+      "issuer": "Bischoff + Scheck GmBh",
+      "orig": 5000000,
+      "curr": 5000000,
+      "maturity": "17/04/2028",
+      "sector": "Industrial",
+      "region": "Baden-Wuerttemberg",
+      "ratingEth": "BB-",
+      "ratingCurr": "BB-",
+      "nextPay": 110502,
+      "capDue": 0,
+      "intDue": 110502
+    },
+    {
+      "issuer": "Riba Mundo Tecnología, S.L.",
+      "orig": 787500,
+      "curr": 787500,
+      "maturity": "09/07/2028",
+      "sector": "Distribución",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "D",
+      "nextPay": 7962,
+      "capDue": 0,
+      "intDue": 7962
+    },
+    {
+      "issuer": "Riba Mundo Tecnología, S.L.",
+      "orig": 337500,
+      "curr": 337500,
+      "maturity": "09/07/2028",
+      "sector": "Distribución",
+      "region": "Valencia",
+      "ratingEth": "BB-",
+      "ratingCurr": "D",
+      "nextPay": 3412,
+      "capDue": 0,
+      "intDue": 3412
+    }
+  ],
+  "triana_sectors": [
+    {
+      "s": "Distribución",
+      "v": 13956
+    },
+    {
+      "s": "Logística",
+      "v": 11125
+    },
+    {
+      "s": "Salud",
+      "v": 6500
+    },
+    {
+      "s": "Tecnología",
+      "v": 6100
+    },
+    {
+      "s": "Industrial",
+      "v": 5485
+    },
+    {
+      "s": "Ingeniería",
+      "v": 5338
+    },
+    {
+      "s": "Construcción",
+      "v": 4250
+    },
+    {
+      "s": "Agroalimentario",
+      "v": 4175
+    },
+    {
+      "s": "Hostelería",
+      "v": 1920
+    }
+  ],
+  "alc_top10": [
+    {
+      "name": "DESARROLLOS AGRO INTENSIVOS, SOCIEDAD LI",
+      "ob": 5.0,
+      "notes": 10,
+      "pct": 6.1
+    },
+    {
+      "name": "GRUPO LANTANIA SA",
+      "ob": 4.75,
+      "notes": 10,
+      "pct": 5.8
+    },
+    {
+      "name": "GREENALIA, SA",
+      "ob": 4.5,
+      "notes": 9,
+      "pct": 5.5
+    },
+    {
+      "name": "FREMONT-BLUESPACE SLU",
+      "ob": 4.5,
+      "notes": 4,
+      "pct": 5.5
+    },
+    {
+      "name": "GRUPO INMOBILIARIO FERROCARRIL SA",
+      "ob": 3.6,
+      "notes": 5,
+      "pct": 4.4
+    },
+    {
+      "name": "INTERNACIONAL DE ALCOHOLES SA",
+      "ob": 3.1,
+      "notes": 11,
+      "pct": 3.8
+    },
+    {
+      "name": "ACEITES ABASA SAU",
+      "ob": 2.981,
+      "notes": 6,
+      "pct": 3.6
+    },
+    {
+      "name": "RIC ENERGY HOLDINGS SL",
+      "ob": 2.9,
+      "notes": 5,
+      "pct": 3.5
+    },
+    {
+      "name": "TERRANOVA LAND SL.",
+      "ob": 2.9,
+      "notes": 5,
+      "pct": 3.5
+    },
+    {
+      "name": "PROMO MELGA SL",
+      "ob": 2.67,
+      "notes": 5,
+      "pct": 3.3
+    }
+  ],
+  "alc_ratings": [
+    [
+      "Baa2",
+      4.5
+    ],
+    [
+      "Baa3",
+      6.5
+    ],
+    [
+      "Ba1",
+      19.94
+    ],
+    [
+      "Ba2",
+      28.098
+    ],
+    [
+      "Ba3",
+      14.538
+    ],
+    [
+      "B1",
+      5.525
+    ],
+    [
+      "B2",
+      1.425
+    ],
+    [
+      "B3",
+      1.522
+    ]
+  ],
+  "alc_sectors": [
+    {
+      "cnae": "484",
+      "sector": "Distribución farmacéutica",
+      "ob": 20.268,
+      "pct": 24.7
+    },
+    {
+      "cnae": "331",
+      "sector": "Ingeniería/Maquinaria",
+      "ob": 6.547,
+      "pct": 8.0
+    },
+    {
+      "cnae": "555",
+      "sector": "Hostelería",
+      "ob": 6.0,
+      "pct": 7.3
+    },
+    {
+      "cnae": "12",
+      "sector": "Tabaco/Agro",
+      "ob": 5.0,
+      "pct": 6.1
+    },
+    {
+      "cnae": "549",
+      "sector": "Energía renovable",
+      "ob": 4.5,
+      "pct": 5.5
+    },
+    {
+      "cnae": "510",
+      "sector": "Agro/Alimentación",
+      "ob": 4.16,
+      "pct": 5.1
+    },
+    {
+      "cnae": "503",
+      "sector": "Inmobiliario",
+      "ob": 3.6,
+      "pct": 4.4
+    },
+    {
+      "cnae": "378",
+      "sector": "Química",
+      "ob": 3.1,
+      "pct": 3.8
+    },
+    {
+      "cnae": "554",
+      "sector": "Restauración",
+      "ob": 2.981,
+      "pct": 3.6
+    },
+    {
+      "cnae": "513",
+      "sector": "Energía",
+      "ob": 2.9,
+      "pct": 3.5
+    },
+    {
+      "cnae": "551",
+      "sector": "Consultoría",
+      "ob": 2.5,
+      "pct": 3.0
+    },
+    {
+      "cnae": "310",
+      "sector": "Muebles/Madera",
+      "ob": 2.0,
+      "pct": 2.4
+    },
+    {
+      "cnae": "446",
+      "sector": "Distribución",
+      "ob": 2.0,
+      "pct": 2.4
+    },
+    {
+      "cnae": "26",
+      "sector": "Electrónica",
+      "ob": 1.725,
+      "pct": 2.1
+    },
+    {
+      "cnae": "473",
+      "sector": "Distribución combustible",
+      "ob": 1.7,
+      "pct": 2.1
+    },
+    {
+      "cnae": "428",
+      "sector": "Construcción civil",
+      "ob": 1.5,
+      "pct": 1.8
+    },
+    {
+      "cnae": "351",
+      "sector": "CNAE 351",
+      "ob": 1.172,
+      "pct": 1.4
+    },
+    {
+      "cnae": "501",
+      "sector": "CNAE 501",
+      "ob": 1.17,
+      "pct": 1.4
+    },
+    {
+      "cnae": "otros",
+      "sector": "Otros",
+      "ob": 9.325,
+      "pct": 11.4
+    }
+  ],
+  "ronda_top10": [
+    {
+      "name": "Novartis Farmaceutica S.A.",
+      "balance": 18177544,
+      "pct": 36.8
+    },
+    {
+      "name": "Curium Pharma Spain, S.A.",
+      "balance": 14894878,
+      "pct": 30.1
+    },
+    {
+      "name": "Altan Pharmaceuticals, S.A.U.",
+      "balance": 4008224,
+      "pct": 8.1
+    },
+    {
+      "name": "Philips Iberica, S.A.U.",
+      "balance": 3748530,
+      "pct": 7.6
+    },
+    {
+      "name": "Spineart España, S.L.U.",
+      "balance": 2397630,
+      "pct": 4.8
+    },
+    {
+      "name": "Leleman, S.L.",
+      "balance": 1404379,
+      "pct": 2.8
+    },
+    {
+      "name": "Ofilingua, S.L.",
+      "balance": 1362926,
+      "pct": 2.8
+    },
+    {
+      "name": "Textil Planas Oliveras, S.A.",
+      "balance": 947561,
+      "pct": 1.9
+    },
+    {
+      "name": "Biocablan, S.L.",
+      "balance": 864305,
+      "pct": 1.7
+    },
+    {
+      "name": "Vortrom Biologics S.L.",
+      "balance": 531962,
+      "pct": 1.1
+    }
+  ],
+  "aum_labels": [
+    "Jun '22",
+    "Jul '22",
+    "Ago '22",
+    "Sep '22",
+    "Oct '22",
+    "Nov '22",
+    "Dic '22",
+    "Ene '23",
+    "Feb '23",
+    "Mar '23",
+    "Abr '23",
+    "May '23",
+    "Jun '23",
+    "Jul '23",
+    "Ago '23",
+    "Sep '23",
+    "Oct '23",
+    "Nov '23",
+    "Dic '23",
+    "Ene '24",
+    "Feb '24",
+    "Mar '24",
+    "Abr '24",
+    "May '24",
+    "Jun '24",
+    "Jul '24",
+    "Ago '24",
+    "Sep '24",
+    "Oct '24",
+    "Nov '24",
+    "Dic '24",
+    "Ene '25",
+    "Feb '25",
+    "Mar '25",
+    "Abr '25",
+    "May '25",
+    "Jun '25",
+    "Jul '25",
+    "Ago '25",
+    "Sep '25",
+    "Oct '25",
+    "Nov '25",
+    "Dic '25",
+    "Ene '26",
+    "Feb '26",
+    "Mar '26",
+    "Abr '26"
+  ],
+  "aum_triana": [
+    33.07,
+    71.12,
+    78.61,
+    84.3,
+    91.8,
+    116.09,
+    156.59,
+    183.19,
+    195.38,
+    193.69,
+    198.69,
+    192.49,
+    192.39,
+    192.39,
+    192.06,
+    191.96,
+    191.96,
+    191.64,
+    188.41,
+    188.24,
+    179.31,
+    179.0,
+    178.92,
+    178.79,
+    178.29,
+    168.07,
+    157.27,
+    144.85,
+    143.66,
+    140.48,
+    137.6,
+    136.16,
+    126.24,
+    123.88,
+    122.74,
+    122.07,
+    121.7,
+    109.38,
+    102.37,
+    89.78,
+    88.64,
+    88.02,
+    91.34,
+    85.97,
+    80.66,
+    61.07,
+    58.85
+  ],
+  "aum_alcant": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    7.2,
+    10.15,
+    11.0,
+    21.45,
+    40.7,
+    40.7,
+    63.85,
+    67.6,
+    71.35,
+    79.87,
+    79.87,
+    77.27,
+    82.97,
+    76.67,
+    84.92,
+    80.07,
+    81.19,
+    81.29,
+    81.86,
+    83.51,
+    77.84,
+    80.52,
+    79.4,
+    79.2,
+    82.07,
+    82.05
+  ],
+  "aum_ronda": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    3.65,
+    2.37,
+    2.65,
+    4.71,
+    11.78,
+    14.09,
+    18.44,
+    19.41,
+    19.92,
+    22.78,
+    18.97,
+    37.79,
+    55.39,
+    42.26,
+    45.72,
+    49.61,
+    49.58
+  ],
+  "aum_alameda": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    5.7,
+    5.7,
+    5.7,
+    5.7
+  ],
+  "aum_total": [
+    33.1,
+    71.1,
+    78.6,
+    84.3,
+    91.8,
+    116.1,
+    156.6,
+    183.2,
+    195.4,
+    193.7,
+    198.7,
+    192.5,
+    192.4,
+    192.4,
+    192.1,
+    192.0,
+    192.0,
+    191.6,
+    188.4,
+    188.2,
+    179.3,
+    186.2,
+    189.1,
+    189.8,
+    199.7,
+    208.8,
+    198.0,
+    208.7,
+    211.3,
+    211.8,
+    221.1,
+    218.4,
+    206.2,
+    211.6,
+    211.2,
+    221.1,
+    220.2,
+    210.0,
+    203.6,
+    194.4,
+    191.1,
+    203.7,
+    227.2,
+    213.3,
+    211.3,
+    198.4,
+    196.2
+  ]
+}

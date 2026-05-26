@@ -764,12 +764,12 @@ function renderBudgetFund(id){
         <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
         <td class="${vc(f.progFirmados.varEur)}">${f.progFirmados.varEur>=0?'+':''}${f.progFirmados.varEur.toFixed(1)}</td><td>${vp(f.progFirmados.varPct)}</td></tr>`:''}
       <tr><td style="font-weight:600">Ingresos (€k)</td>
-        <td>${f.ingresos.acReal!=null?fK(f.ingresos.acReal):'—'}</td><td>${f.ingresos.mesReal!=null?fK(f.ingresos.mesReal):'—'}</td><td style="font-weight:700">${f.ingresos.ytdReal.toFixed(1)}</td>
+        <td>${f.ingresos.acReal.toFixed(1)}</td><td>${f.ingresos.mesReal.toFixed(1)}</td><td style="font-weight:700">${f.ingresos.ytdReal.toFixed(1)}</td>
         <td style="color:var(--gray-400)">${f.ingresos.acBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.mesBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.ytdBudg.toFixed(1)}</td>
         <td class="${vc(f.ingresos.varEur)}">${f.ingresos.varEur>=0?'+':''}${f.ingresos.varEur.toFixed(1)}</td><td>${vp(f.ingresos.varPct)}</td></tr>
       ${f.gastos.ytdReal>0||f.gastos.ytdBudg>0?`<tr><td style="font-weight:600">Gastos (€k)</td>
-        <td>${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</td><td>${f.gastos.mesReal!=null&&f.gastos.mesReal!==0?fK(Math.abs(f.gastos.mesReal)):'—'}</td><td style="font-weight:700">${f.gastos.ytdReal!=null&&f.gastos.ytdReal!==0?fK(Math.abs(f.gastos.ytdReal)):'—'}</td>
-        <td style="color:var(--gray-400)">${f.gastos.acBudg!=null&&f.gastos.acBudg!==0?fK(Math.abs(f.gastos.acBudg)):'—'}</td><td style="color:var(--gray-400)">${f.gastos.mesBudg>0?'('+f.gastos.mesBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.ytdBudg>0?'('+f.gastos.ytdBudg.toFixed(1)+')':'—'}</td>
+        <td>${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</td><td>${f.gastos.mesReal!=null&&f.gastos.mesReal!==0?fK(Math.abs(f.gastos.mesReal)):'—'}</td><td style="font-weight:700">${f.gastos.ytdReal>0?'('+f.gastos.ytdReal.toFixed(1)+')':'—'}</td>
+        <td style="color:var(--gray-400)">${f.gastos.acBudg>0?'('+f.gastos.acBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.mesBudg>0?'('+f.gastos.mesBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.ytdBudg>0?'('+f.gastos.ytdBudg.toFixed(1)+')':'—'}</td>
         <td></td><td></td></tr>`:''}
       <tr class="total-row"><td>Ingresos netos (€k)</td>
         <td>${f.ingNetos.acReal.toFixed(1)}</td><td>${f.ingNetos.mesReal.toFixed(1)}</td><td>${f.ingNetos.ytdReal.toFixed(1)}</td>
@@ -966,7 +966,7 @@ function renderTrianaPortfolio(){
       </select>
       <span id="trianaCount" style="font-size:12px;color:var(--gray-400)"></span>
     </div>
-    <div class="tbl-wrap"><table>
+    <div class="tbl-wrap" style="height:420px;overflow-y:auto;"><table>
     <thead><tr>
       <th>Deudor</th><th>Sector</th><th>Región</th>
       <th style="text-align:right">Nominal orig.</th><th style="text-align:right">Nominal actual</th>
@@ -1316,284 +1316,13 @@ function renderRondaPortfolio(){
   const pipelineHtml = ``
   setTimeout(()=>{
     const ctx=document.getElementById('rondaTop10Chart');
-    if(ctx){
-      dc('ronTop');
-      charts.ronTop=new Chart(ctx,{
-        type:'bar',
-        data:{
-          labels:RONDA_TOP10.map(d=>d.name),
-          datasets:[{
-            data:RONDA_TOP10.map(d=>d.balance/1e6),
-            backgroundColor:'#3B6D11',
-            borderWidth:0,
-            borderRadius:3
-          }]
-        },
-        options:{
-          responsive:true,maintainAspectRatio:false,indexAxis:'y',
-          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` €${c.parsed.x.toFixed(1)}Mn (${RONDA_TOP10[c.dataIndex].pct}%)`}}},
-          scales:{
-            x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}}},
-            y:{grid:{display:false},ticks:{font:{size:10}}}
-          }
-        }
-      });
-    }
+    if(ctx){dc('ronTop');charts.ronTop=new Chart(ctx,{type:'bar',data:{labels:RONDA_TOP10.map(d=>d.name),datasets:[{data:RONDA_TOP10.map(d=>d.balance/1e6),backgroundColor:'#3B6D11',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` €${c.parsed.x.toFixed(1)}Mn (${RONDA_TOP10[c.dataIndex].pct}%)`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});}
   },150);
   return kpisHtml + chartHtml + tableHtml + debtorHtml + covenantsHtml + pipelineHtml;
 }
 
 
 
-const DOCS_TREE = {
-  reportes: {
-    label:'Reportes', icon:'📊',
-    subs: {
-      budget: { label:'Budget 2026',
-        subs: {
-          zcc: { label:'Beka Credit & Beka Credit Group',
-            latest:{name:'Budget BC 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041203_Budget%20BC%202026%20-%20Consejo.pdf'},
-            historico:[]},
-          zco: { label:'Beka Credit Origination Advisory',
-            latest:{name:'Budget BCO 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041225_Budget%20BCO%202026%20-%20Consejo.pdf'},
-            historico:[]},
-          zch: { label:'Beka Healthcare',
-            latest:{name:'Budget BH 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041225_Budget%20BH%202026%20-%20Consejo.pdf'},
-            historico:[]},
-        }},
-      cierres:     { label:'Cierres Mensuales',
-        latest:{name:'ZintraCCG-Management Accounts 30-04-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2030-04-26.pdf'},
-        historico:[
-          {name:'Accounts 31-03-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-03-26.pdf'},
-          {name:'Accounts 28-02-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2028-02-26.pdf'},
-          {name:'Accounts 31-01-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-01-26.pdf'},
-          {name:'Accounts 31-12-25', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-12-25.pdf'},
-        ]},
-      monday:      { label:'Monday Update',
-        latest:{name:'2026_S19_Control Presupuesto Mayo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S19_Control Presupuesto Mayo.pdf'},
-        historico:[
-          {name:'S18_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S18_Control Presupuesto Abril.pdf'},
-          {name:'S17_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S17_Control Presupuesto Abril.pdf'},
-          {name:'S16_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S16_Control Presupuesto Abril.pdf'},
-          {name:'S15_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S15_Control Presupuesto Abril.pdf'},
-          {name:'S13_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S13_Control Presupuesto Marzo.pdf'},
-          {name:'S12_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S12_Control Presupuesto Marzo.pdf'},
-          {name:'S11_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S11_Control Presupuesto Marzo.pdf'},
-          {name:'S10_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S10_Control Presupuesto Marzo.pdf'},
-          {name:'S9_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S9_Control Presupuesto Febrero.pdf'},
-          {name:'S8_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S8_Control Presupuesto Febrero.pdf'},
-          {name:'S7_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S7_Control Presupuesto Febrero.pdf'},
-          {name:'S6_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S6_Control Presupuesto Febrero.pdf'},
-        ]},
-      coinversion: { label:'Reporte Coinversión',
-        latest:{name:"Financiación e inversiones - 04'26", url:"https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Coinversión/Financiación e inversiones - 04'26.pdf"},
-        historico:[]},
-    }
-  },
-  fondos: {
-    label:'Fondos', icon:'🏦',
-    subs: {
-      triana: { label:'Triana', color:'#185FA5',
-        subs: {
-          legal: { label:'Documentación Legal', docs:[
-            {name:'Master Framework Agreement (MFA)', desc:'Contrato con inversores', url:''},
-            {name:'EGF Guarantee Agreement', desc:'Garantía FEI en vigor', url:''},
-            {name:'Loan Admin. Agreement', desc:'', url:''},
-            {name:'Triana Investment Advisory Agreement', desc:'', url:''},
-            {name:'RAIF Investment Advisory Agreement', desc:'', url:''},
-          ]},
-          ccaa: { label:'Cuentas Anuales', entities:[
-            {name:'Triana SME Lending',
-              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2025.pdf'},
-              historico:[
-                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2024.pdf'},
-                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2023.pdf'},
-                {name:'CCAA 2022', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2022.pdf'},
-              ]},
-            {name:'SICAV RAIF',
-              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2025.pdf'},
-              historico:[
-                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2024.pdf'},
-                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2023.pdf'},
-                {name:'CCAA 2022', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2022.pdf'},
-              ]},
-            {name:'Beka Investments GP',
-              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2025.pdf'},
-              historico:[
-                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2024.pdf'},
-                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2023.pdf'},
-              ]},
-          ]},
-          manuales: { label:'Manuales', docs:[
-            {name:'Manual de Crédito', desc:'', url:''},
-            {name:'Manual de Recuperaciones', desc:'', url:''},
-          ]},
-          reporting: { label:'Reporting Inversores', docs:[
-            {name:'Weekly datatape', desc:'', url:''},
-            {name:'Monthly datatape', desc:'', url:''},
-            {name:'Quarterly FEI', desc:'', url:''},
-            {name:'IPD', desc:'', url:''},
-          ]},
-        }
-      },
-      alcantara: { label:'Alcántara', color:'#534AB7',
-        subs:{
-          legal:{label:'Documentación Legal', docs:[
-            {name:'Organigrama', desc:'', url:''},
-            {name:'Resumen del fondo', desc:'', url:''},
-            {name:'Documentación legal fondo', desc:'', url:''},
-            {name:'Manuales (crédito + recuperaciones)', desc:'', url:''},
-          ]},
-          portfolio:{label:'Portfolio y Performance', docs:[
-            {name:'Portfolio', desc:'', url:''},
-            {name:'Evolución histórica', desc:'', url:''},
-            {name:'Rentabilidad / Performance', desc:'', url:''},
-          ]},
-        }
-      },
-      vera: { label:'Vera', color:'#534AB7',
-        subs:{
-          legal:{label:'Documentación Legal', docs:[
-            {name:'Organigrama', desc:'', url:''},
-            {name:'Resumen del fondo', desc:'En proceso de cierre', url:''},
-            {name:'Documentación legal fondo', desc:'', url:''},
-          ]},
-        }
-      },
-      ronda: { label:'Ronda', color:'#3B6D11',
-        subs:{
-          legal:{label:'Documentación Legal', docs:[
-            {name:'Organigrama', desc:'', url:''},
-            {name:'Resumen del fondo', desc:'', url:''},
-            {name:'Documentación legal fondo', desc:'', url:''},
-            {name:'Manual', desc:'', url:''},
-          ]},
-        }
-      },
-      alameda: { label:'Alameda', color:'#185FA5',
-        subs:{
-          legal:{label:'Documentación Legal', docs:[
-            {name:'Organigrama', desc:'', url:''},
-            {name:'Resumen del fondo', desc:'', url:''},
-            {name:'Documentación legal fondo', desc:'', url:''},
-            {name:'Manual', desc:'', url:''},
-          ]},
-          reporting:{label:'Reporting', docs:[
-            {name:'Reportes inversores', desc:'', url:''},
-          ]},
-        }
-      },
-      belmonte: { label:'Belmonte', color:'#185FA5',
-        subs:{
-          legal:{label:'Documentación Legal', docs:[
-            {name:'Organigrama', desc:'', url:''},
-            {name:'Resumen del fondo', desc:'', url:''},
-            {name:'Documentación legal fondo', desc:'', url:''},
-            {name:'Manual', desc:'', url:''},
-          ]},
-        }
-      },
-    }
-  },
-  legal: {
-    label:'Legal', icon:'⚖️',
-    subs:{
-      ccaa_zcc:{ label:'CCAA ZCC (Beka Credit)',
-        latest:{name:'2025 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2025 CCAA Beka Credit-Auditadas.pdf'},
-        historico:[
-          {name:'2024 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2024 CCAA Beka Credit-Auditadas.pdf'},
-          {name:'2023 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2023 CCAA Beka Credit-Auditadas.pdf'},
-          {name:'2022 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2022 CCAA Beka Credit-Auditadas.pdf'},
-          {name:'2021 CCAA Beka Credit (Sin Firmas)', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2021 CCAA Beka Credit (Sin Firmas).pdf'},
-        ]},
-      ccaa_zco:{ label:'CCAA ZCO (Beka Credit Origination)',
-        latest:{name:'2025 CCAA Beka Credit Origination - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2025 CCAA Beka Credit Origination-Auditadas.pdf'},
-        historico:[
-          {name:'2024 CCAA Beka Credit Origination - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2024 CCAA Beka Credit Origination-Auditadas.pdf'},
-          {name:'2023 CCAA Beka Credit Origination', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2023 CCAA Beka Credit Origination.pdf'},
-          {name:'2022 CCAA Beka Credit Origination', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2022 CCAA Beka Credit Origination.pdf'},
-        ]},
-      ccaa_zch:{ label:'CCAA ZCH (Beka Healthcare)',
-        latest:{name:'2025 CCAA Beka Healthcare - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCH/2025 CCAA Beka Healthcare-Auditadas.pdf'},
-        historico:[
-          {name:'2024 CCAA Beka Healthcare - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCH/2024 CCAA Beka Healthcare-Auditadas.pdf'},
-        ]},
-      mercantil:{ label:'Datos mercantiles', docs:[
-        {name:'Datos mercantiles ZCC', desc:'', url:''},
-        {name:'Datos mercantiles ZCO', desc:'', url:''},
-        {name:'Datos mercantiles ZCH', desc:'', url:''},
-      ]},
-      poderes:{ label:'Poderes y contratos', docs:[
-        {name:'Poderes notariales', desc:'', url:''},
-        {name:'Contratos', desc:'', url:''},
-      ]},
-    }
-  },
-  contabilidad: {
-    label:'Contabilidad', icon:'📒',
-    subs:{
-      liquidez:{ label:'Proyección Liquidez',
-        latest:{name:'260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH)', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Contabilidad/Proyecci%C3%B3n%20Liquidez/260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH).pdf'},
-        historico:[
-          {name:'260316 13WCF ZINTRA Agregado', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Contabilidad/Proyecci%C3%B3n%20Liquidez/260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH).pdf'},
-        ]},
-      cierres:{ label:'Cierres contables', docs:[
-        {name:'Cierres contables ZCC', desc:'', url:''},
-        {name:'Cierres contables ZCO', desc:'', url:''},
-        {name:'Cierres contables ZCH', desc:'', url:''},
-      ]},
-      tesoreria:{ label:'Tesorería', docs:[
-        {name:'Tesorería consolidada', desc:'', url:''},
-      ]},
-      prestamos:{ label:'Préstamos', docs:[
-        {name:'Préstamos intragrupo', desc:'', url:''},
-      ]},
-    }
-  },
-  recuperaciones: {
-    label:'Recuperaciones', icon:'🔄',
-    subs:{
-      comite:{ label:'Agenda Comité de Recuperaciones',
-        latest:{name:'2026.04.22 - Agenda Comité de Recuperaciones', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.04.22 - Agenda Comité de Recuperaciones.pdf'},
-        historico:[
-          {name:'2026.04.09', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.04.09 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.03.26', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.03.26 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.03.12', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.03.12 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.02.26', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.02.26 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.02.12', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.02.12 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.01.29', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.01.29 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2026.01.15', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.01.15 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2025.12.18', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.12.18 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2025.12.04', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.12.04 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2025.11.20', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.11.20 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2025.11.06', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.11.06 - Agenda Comité de Recuperaciones.pdf'},
-          {name:'2025.10.22', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.10.22 - Agenda Comité de Recuperaciones.pdf'},
-        ]},
-    }
-  },
-  politicas: {
-    label:'Políticas y Procesos', icon:'📋',
-    subs:{
-      gastos:{label:'Política de gastos', docs:[{name:'Política de gastos', desc:'', url:''}]},
-      pbcft: {label:'Manual PBCFT',       docs:[{name:'Manual PBCFT', desc:'', url:''}]},
-    }
-  },
-  rrhh: {
-    label:'RRHH', icon:'👥',
-    subs:{
-      estructura:{label:'Estructura departamentos', docs:[{name:'Estructura departamentos', desc:'', url:''}]},
-      governance: {label:'Governance',               docs:[{name:'Governance', desc:'', url:''}]},
-    }
-  },
-  marketing: {
-    label:'Marketing', icon:'🎨',
-    subs:{
-      templates:{label:'Templates', docs:[{name:'Templates corporativos', desc:'', url:''}]},
-    }
-  },
-};
-
-// ── DOCS RENDER ───────────────────────────────────────────────────
 function renderDocs(path) {
   docsNav_ = path || null;
   const parts = docsNav_ ? docsNav_.split('/') : [];
@@ -1874,6 +1603,39 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(window.location.search.includes('staging=1'))
       localStorage.setItem('zintra_staging','1');
   }
+})();
+
+// ── JSON DATA LOADER (weekly update) ─────────────────────────────
+(async function(){
+  try {
+    const res = await fetch('data.json');
+    if(!res.ok) return; // fallback to inline data
+    const d = await res.json();
+    
+    // Overwrite inline data with JSON data
+    if(d.triana_loans)   { window.TRIANA_LOANS=d.triana_loans; }
+    if(d.triana_sectors) { window.TRIANA_SECTORS=d.triana_sectors; }
+    if(d.alc_top10)      { window.ALC_TOP10=d.alc_top10; }
+    if(d.alc_ratings)    { window.ALC_RATINGS=d.alc_ratings; }
+    if(d.alc_sectors)    { window.ALC_SECTORS=d.alc_sectors; }
+    if(d.ronda_top10)    { window.RONDA_TOP10=d.ronda_top10; }
+    if(d.aum_labels)     { window.AUM_LABELS=d.aum_labels; window.AUM_TRIANA=d.aum_triana; window.AUM_ALCANT=d.aum_alcant; window.AUM_RONDA=d.aum_ronda; window.AUM_ALAMEDA=d.aum_alameda; window.AUM_TOTAL=d.aum_total; }
+    
+    // Update FUNDS data
+    if(d.funds){
+      Object.keys(d.funds).forEach(id=>{
+        if(FUNDS[id]){
+          const fd=d.funds[id];
+          if(fd.aum)      FUNDS[id].aum      = {...FUNDS[id].aum,      ...fd.aum};
+          if(fd.ingresos) FUNDS[id].ingresos  = {...FUNDS[id].ingresos, ...fd.ingresos};
+          if(fd.gastos)   FUNDS[id].gastos    = {...FUNDS[id].gastos,   ...fd.gastos};
+          if(fd.ingNetos) FUNDS[id].ingNetos  = {...FUNDS[id].ingNetos, ...fd.ingNetos};
+          if(fd.pipeline) FUNDS[id].pipeline  = fd.pipeline;
+          if(fd.monthly)  FUNDS[id].monthly   = fd.monthly;
+        }
+      });
+    }
+  } catch(e){ /* use inline data */ }
 })();
 
 renderOverview();
