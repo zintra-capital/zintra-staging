@@ -1314,6 +1314,32 @@ function renderRondaPortfolio(){
 
   // Pipeline
   const pipelineHtml = ``
+  setTimeout(()=>{
+    const ctx=document.getElementById('rondaTop10Chart');
+    if(ctx){
+      dc('ronTop');
+      charts.ronTop=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:RONDA_TOP10.map(d=>d.name),
+          datasets:[{
+            data:RONDA_TOP10.map(d=>d.balance/1e6),
+            backgroundColor:'#3B6D11',
+            borderWidth:0,
+            borderRadius:3
+          }]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,indexAxis:'y',
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` €${c.parsed.x.toFixed(1)}Mn (${RONDA_TOP10[c.dataIndex].pct}%)`}}},
+          scales:{
+            x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}}},
+            y:{grid:{display:false},ticks:{font:{size:10}}}
+          }
+        }
+      });
+    }
+  },150);
   return kpisHtml + chartHtml + tableHtml + debtorHtml + covenantsHtml + pipelineHtml;
 }
 
