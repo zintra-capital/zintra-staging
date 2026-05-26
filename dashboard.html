@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  if(sessionStorage.getItem('gestora_ok') !== '1'){
+    window.location.href = './index.html';
+  }
+</script>
+<title>Zintra Capital · Reporting</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --blue:#185FA5;--blue-lt:#E6F1FB;--blue-mid:#B5D4F4;--blue-dk:#0C447C;
+    --purple:#534AB7;--purple-lt:#EEEDFE;
+    --green:#3B6D11;--green-lt:#EAF3DE;
+    --gray-50:#F8F8F8;--gray-100:#F0F0F0;--gray-200:#E0E0E0;
+    --gray-400:#999;--gray-600:#555;--gray-900:#1a1a1a;
+    --success:#27AE60;--success-lt:#E8F8EF;
+    --warning:#E67E22;--warning-lt:#FEF3E7;
+    --danger:#E74C3C;--danger-lt:#FDEDEC;
+    --info:#2980B9;--info-lt:#EBF5FB;
+    --border:#E5E5E5;--radius:10px;--radius-sm:6px;
+    --shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6F9;color:var(--gray-900);font-size:14px;}
+  .sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:#1A3A5C;z-index:100;display:flex;flex-direction:column;}
+  .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .sidebar-logo-title{font-size:15px;font-weight:600;color:#fff;}
+  .sidebar-logo-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .sidebar-section{padding:16px 12px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em;}
+  .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:rgba(255,255,255,0.65);font-size:13px;border-left:3px solid transparent;transition:all .15s;}
+  .sidebar-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+  .sidebar-item.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#5B9BD5;font-weight:500;}
+  .sidebar-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:rgba(255,255,255,0.4);}
+  .main{margin-left:220px;padding:28px 32px;min-height:100vh;}
+  .page{display:none;}.page.active{display:block;}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+  .page-title{font-size:22px;font-weight:600;}
+  .page-sub{font-size:13px;color:var(--gray-400);margin-top:3px;}
+  .badge-week{display:inline-flex;align-items:center;background:var(--info-lt);color:var(--info);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  .kpi-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;box-shadow:var(--shadow);}
+  .kpi-label{font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .kpi-value{font-size:22px;font-weight:700;color:var(--gray-900);}
+  .kpi-sub{font-size:12px;margin-top:4px;}
+  .up{color:var(--success);}.dn{color:var(--danger);}.neu{color:var(--gray-400);}
+  .card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow);}
+  .card-title{font-size:13px;font-weight:600;margin-bottom:14px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+  /* Fund overview cards */
+  .fund-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+  .fund-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+  .fund-card:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(0,0,0,0.1);}
+  .fc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .fc-name-wrap{display:flex;align-items:center;gap:8px;}
+  .fc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+  .fc-name{font-size:15px;font-weight:700;}
+  .fc-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;margin-top:3px;}
+  .fc-dates{font-size:11px;color:var(--gray-400);text-align:right;}
+  .fc-strategy{font-size:12px;color:var(--gray-600);line-height:1.5;margin-bottom:12px;min-height:36px;}
+  .fc-divider{height:1px;background:var(--gray-100);margin:10px 0;}
+  .fc-aum-lbl{font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+  .fc-aum{font-size:26px;font-weight:700;}
+  .fc-var{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-top:4px;}
+  .fc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px;}
+  .fc-metric{background:var(--gray-50);border-radius:6px;padding:8px;text-align:center;}
+  .fc-metric-lbl{font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+  .fc-metric-val{font-size:14px;font-weight:700;}
+  .cap-bar-track{height:6px;border-radius:3px;overflow:hidden;display:flex;margin-top:10px;}
+  .cap-bar-legend{display:flex;gap:10px;margin-top:5px;flex-wrap:wrap;}
+  .cap-bar-legend span{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--gray-400);}
+  .cap-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:8px 10px;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--gray-50);}
+  td{padding:9px 10px;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:var(--gray-50);}
+  .tbl-wrap{overflow-x:auto;}
+  .var-pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600;}
+  .var-pos{background:var(--success-lt);color:var(--success);}
+  .var-neg{background:var(--danger-lt);color:var(--danger);}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+  .badge-green{background:var(--success-lt);color:var(--success);}
+  .badge-amber{background:var(--warning-lt);color:var(--warning);}
+  .badge-blue{background:var(--info-lt);color:var(--info);}
+  .budget-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .budget-tab{padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--gray-600);transition:all .15s;font-weight:500;}
+  .budget-tab.active{background:#1A3A5C;color:#fff;border-color:#1A3A5C;}
+  .budget-tab:hover:not(.active){background:var(--gray-50);}
+  .fund-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .fund-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .fund-header-name{font-size:20px;font-weight:700;}
+  .fund-header-meta{font-size:13px;color:var(--gray-400);margin-top:4px;}
+  .nota{font-size:12px;color:var(--warning);background:var(--warning-lt);padding:8px 12px;border-radius:var(--radius-sm);margin-top:12px;border-left:3px solid var(--warning);line-height:1.5;}
+  .sec-title{font-size:12px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin:20px 0 10px;}
+  tr.total-row td{font-weight:700;background:#F0F4FA;border-top:2px solid var(--blue);}
+  tr.fund-group-header td{background:var(--gray-50);font-size:11px;font-weight:600;color:var(--gray-600);padding:6px 10px;border-bottom:1px solid var(--border);}
+
+  /* Docs portal */
+  .docs-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+  .docs-tab{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--gray-600);transition:all .15s;font-weight:500;}
+  .docs-tab.active{background:#1A3A5C;color:#fff;border-color:#1A3A5C;}
+  .docs-tab:hover:not(.active){background:var(--gray-50);}
+  .docs-section{display:none;}.docs-section.active{display:block;}
+  .docs-latest{background:linear-gradient(135deg,#1A3A5C 0%,#2E6DA4 100%);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+  .docs-latest-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+  .docs-latest-name{font-size:14px;font-weight:600;color:#fff;}
+  .docs-open-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(255,255,255,0.15);color:#fff;border-radius:var(--radius-sm);font-size:13px;font-weight:500;text-decoration:none;border:1px solid rgba(255,255,255,0.2);cursor:pointer;transition:background .15s;white-space:nowrap;}
+  .docs-open-btn:hover{background:rgba(255,255,255,0.25);}
+  .docs-hist-toggle{font-size:12px;color:var(--blue);cursor:pointer;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
+  .docs-hist-toggle:hover{text-decoration:underline;}
+  .docs-hist{display:none;}
+  .docs-hist.open{display:block;}
+  .docs-hist-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:13px;}
+  .docs-hist-row:last-child{border-bottom:none;}
+  .docs-hist-name{color:var(--gray-700,#444);flex:1;}
+  .docs-hist-link{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--blue-lt);color:var(--blue);border-radius:var(--radius-sm);font-size:12px;font-weight:500;text-decoration:none;cursor:pointer;}
+  .docs-hist-link:hover{background:var(--blue-mid);}
+  .docs-group{margin-bottom:24px;}
+  .docs-group-title{font-size:13px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+  .docs-empty{text-align:center;padding:32px;color:var(--gray-400);font-size:13px;}
+  .docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
+  .docs-entity-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;box-shadow:var(--shadow);}
+  .docs-entity-title{font-size:12px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
+
+  /* ─── MOBILE ─────────────────────────────────────────────── */
+  .mob-bar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:#1A3A5C;z-index:300;align-items:center;padding:0 16px;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+  .mob-bar-title{font-size:15px;font-weight:600;color:#fff;flex:1;}
+  .mob-bar-date{font-size:11px;color:rgba(255,255,255,0.5);}
+  .mob-hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:6px;border:none;background:none;width:36px;height:36px;}
+  .mob-hamburger span{display:block;height:2px;width:22px;background:#fff;border-radius:2px;transition:all .25s;}
+  .mob-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .mob-hamburger.open span:nth-child(2){opacity:0;}
+  .mob-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;}
+  .mob-overlay.open{display:block;}
+
+  @media (max-width: 768px){
+    .mob-bar{display:flex;}
+    .sidebar{
+      position:fixed;top:0;left:0;bottom:0;
+      transform:translateX(-100%);
+      transition:transform .25s ease;
+      z-index:250;width:260px;
+      overflow-y:auto;
+    }
+    .sidebar.mob-open{transform:translateX(0);}
+    .main{margin-left:0!important;padding:64px 12px 24px!important;}
+    .kpi-grid{grid-template-columns:1fr 1fr!important;gap:10px!important;}
+    .fund-grid{grid-template-columns:1fr!important;gap:12px!important;}
+    .grid-2,.grid-3{grid-template-columns:1fr!important;}
+    .docs-grid{grid-template-columns:1fr!important;}
+    .topbar{flex-direction:column;gap:8px;}
+    .page-title{font-size:18px!important;}
+    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    table{min-width:540px;}
+    .card{padding:12px!important;}
+    .kpi-card{padding:12px 14px!important;}
+    .kpi-value{font-size:20px!important;}
+    .sec-title{font-size:11px!important;}
+    canvas{max-height:220px;}
+    .budget-tabs{flex-wrap:wrap;gap:4px;}
+    .budget-tab{padding:5px 10px!important;font-size:12px!important;}
+  }
+  @media (max-width: 400px){
+    .kpi-grid{grid-template-columns:1fr!important;}
+    .main{padding:60px 8px 20px!important;}
+    .kpi-value{font-size:18px!important;}
+  }
+
+
+  /* Staging banner */
+  .staging-banner{display:none;position:fixed;top:0;left:0;right:0;height:28px;background:#F59E0B;z-index:999;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:600;color:#000;}
+  .staging-banner.visible{display:flex;}
+  body.staging .main{padding-top:28px;}
+  body.staging .mob-bar{top:28px;}
+  body.staging .sidebar{top:28px;}
+</style>
+</head>
+<body>
+
+<!-- Mobile top bar -->
+<div class="staging-banner" id="stagingBanner">
+  ⚠ ENTORNO DE PRUEBAS — Los cambios aquí no afectan a producción
+</div>
+
+<div class="mob-bar" id="mobBar">
+  <div class="mob-hamburger" onclick="toggleMobMenu()" id="mobHam">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="mob-bar-title">Zintra Capital</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.5)" id="mobDate">Datos a 30/04/2026</div>
+</div>
+<div class="mob-overlay" id="mobOverlay" onclick="closeMobMenu()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">Zintra Capital</div>
+    <div class="sidebar-logo-sub">Fondos de Deuda</div>
+  </div>
+  <div class="sidebar-section">General</div>
+  <div class="sidebar-item active" onclick="showPage('overview',this)">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <span>Vista general</span>
+  </div>
+  <div class="sidebar-item" onclick="showPage('budget',this)">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+    <span>Budget 2026</span>
+  </div>
+  <div class="sidebar-item" onclick="showPage('docs',this)">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Portal documentos</span>
+  </div>
+  <div class="sidebar-section">Fondos</div>
+  <div class="sidebar-item" onclick="showFund('triana',this)"><span class="dot" style="background:#185FA5"></span><span>Triana</span></div>
+  <div class="sidebar-item" onclick="showFund('alcantara',this)"><span class="dot" style="background:#534AB7"></span><span>Alcántara</span></div>
+  <div class="sidebar-item" onclick="showFund('vera',this)"><span class="dot" style="background:#534AB7"></span><span>Vera</span></div>
+  <div class="sidebar-item" onclick="showFund('ronda',this)"><span class="dot" style="background:#3B6D11"></span><span>Ronda</span></div>
+  <div class="sidebar-item" onclick="showFund('alameda',this)"><span class="dot" style="background:#185FA5"></span><span>Alameda</span></div>
+  <div class="sidebar-item" onclick="showFund('belmonte',this)"><span class="dot" style="background:#185FA5"></span><span>Belmonte</span></div>
+
+  <div class="sidebar-footer" id="sidebarFooter">Datos a 30/04/2026</div>
+</nav>
+
+<main class="main">
+
+  <div class="page active" id="page-overview">
+    <div class="topbar">
+      <div><div class="page-title">Vista general</div><div class="page-sub">Datos reales a <strong>30 abril 2026</strong> · Estimación mayo en curso</div></div>
+      <div class="badge-week" id="badgeDate">&#128197; Datos a 30/04/2026</div>
+    </div>
+    <div class="kpi-grid" id="overviewKpis">
+      <div class="kpi-card"><div class="kpi-label">AUM real ac. abril</div><div class="kpi-value" id="ov_aum">€196.2M</div><div class="kpi-sub dn" id="ov_aum_sub">vs €289.5M budget ac. abril</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ingresos brutos ac. abril</div><div class="kpi-value" id="ov_ing">€1,529k</div><div class="kpi-sub dn" id="ov_ing_sub">vs €2,490k budget</div></div>
+      <div class="kpi-card"><div class="kpi-label">Gastos ac. abril</div><div class="kpi-value" id="ov_gas">€142k</div><div class="kpi-sub up" id="ov_gas_sub">vs €311k budget</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ing. netos ac. abril</div><div class="kpi-value" id="ov_net">€1,387k</div><div class="kpi-sub dn" id="ov_net_sub">vs €2,178k budget</div></div>
+    </div>
+    <div class="sec-title" style="margin-top:8px">Evolución AUM (€M) — 2026</div>
+    <div class="card" style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:13px;font-weight:600">AUM mensual por fondo</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--gray-400)">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:2px;background:#185FA5;display:inline-block;border-radius:2px"></span>Triana</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:2px;background:#534AB7;display:inline-block;border-radius:2px"></span>Alcántara</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:2px;background:#3B6D11;display:inline-block;border-radius:2px"></span>Ronda</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:2px;background:#2980B9;display:inline-block;border-radius:2px"></span>Alameda</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:20px;height:2px;background:#1a1a1a;border-top:2px dashed #1a1a1a;display:inline-block"></span>Total</span>
+        </div>
+      </div>
+      <div style="position:relative;height:260px"><canvas id="aumEvolutionChart" role="img" aria-label="Gráfico de evolución de AUM por fondo en 2026"></canvas></div>
+    </div>
+  </div>
+
+    <div class="sec-title">Fondos</div>
+    <div class="fund-grid" id="fundGrid"></div>
+
+  <div class="page" id="page-budget">
+    <div class="topbar">
+      <div><div class="page-title">Budget 2026</div><div class="page-sub">Real vs presupuesto · Datos a <strong>30 abril 2026</strong></div></div>
+      <div class="badge-week">&#128197; YTD a 30/04/2026 + est. mayo</div>
+    </div>
+    <div class="budget-tabs" id="budgetTabs"></div>
+    <div id="budgetContent"></div>
+  </div>
+
+  <div class="page" id="page-fund">
+    <div id="fundContent"></div>
+  </div>
+
+
+  <!-- DOCS PORTAL -->
+  <div class="page" id="page-docs">
+    <div class="topbar">
+      <div><div class="page-title">Portal de documentos</div><div class="page-sub">Acceso centralizado a todos los documentos de Zintra Capital</div></div>
+      <div class="badge-week">&#128274; Acceso via SharePoint</div>
+    </div>
+    <div class="docs-nav" id="docsNav"></div>
+    <div id="docsContent"></div>
+  </div>
+</main>
+
+<script>
+const FUNDS = {
+  triana:{
+    color:'#185FA5',name:'Triana',tipo:'lp',tipoLabel:'Largo plazo',
+    manager:'Julieta Garretano',inicio:'Jun 2021',fin:'Jun 2031',
+    estrategia:'Direct lending a pymes españolas. Préstamos senior secured y unitranche a tipo variable. Plazo medio 5-6 años. Garantía FEI.',
+    tir:11.2,tirNeta:9.5,tirObj:11.0,moic:1.30,tvpi:1.30,dpi:0.14,mgmtFee:0.009,hurdle:0.07,
+    capStruct:{equity:45,mezz:0,deuda:55},
+    aum:{real:57.7,budget:62.2,acReal:58.848,mesReal:-1.305,acBudg:64.191,mesBudg:-1.989,varEur:-5.343,varPct:-8.3},
+    ingresos:{acReal:217.751,mesReal:43.647,ytdReal:261.4,acBudg:209.212,mesBudg:54.164,ytdBudg:263.4,varEur:8.539,varPct:4.1},
+    gastos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    ingNetos:{acReal:217.751,mesReal:43.647,ytdReal:261.4,acBudg:209.212,mesBudg:54.164,ytdBudg:263.4,varEur:8.539,varPct:4.1},
+    monthly:{
+      aum:{
+        budget:[75.7,74.8,65.1,64.2,62.2,61.7,60.8,58.8,58.3,57.3,55.3,54.6],
+        real:  [86.0,80.7,61.1,58.8,null,null,null,null,null,null,null,null]
+      },
+      ingresos:{
+        budget:[52.7,52.0,59.8,44.7,54.2,42.9,42.4,51.2,40.5,40.0,48.2,38.1],
+        real:  [54.1,62.6,56.1,45.0,null,null,null,null,null,null,null,null]
+      },
+      gastos:{
+        budget:[0,0,0,0,0,0,0,0,0,0,0,0],
+        real:  [0,0,0,0,null,null,null,null,null,null,null,null]
+      }
+    },
+    nota:null,
+    pipeline:[{cliente:'Dental Company',importe:'€6.5M',fecha:'Jun 2026',estado:'Venta firmada · cumpliendo CPs'}],
+    amort:[{cliente:'Transnugon',importe:'€0.1M',fecha:'06/05/2026'},{cliente:'Envialia',importe:'€1.0M',fecha:'06/05/2026'},{cliente:'One Shot',importe:'€0.2M',fecha:'13/05/2026'}]
+  },
+  alcantara:{
+    color:'#534AB7',name:'Alcántara',tipo:'pag',tipoLabel:'Pagarés financieros',
+    manager:'Fran Campos',inicio:'Ene 2020',fin:'Rotativo',
+    estrategia:'Descuento de pagarés financieros a corto plazo. Vehículo rotativo, plazo medio 60-90 días.',
+    tir:9.8,tirObj:9.5,moic:null,dpi:null,capStruct:null,
+    progFirmados:{real:188.2,budget:210.6,acReal:183.9,mesReal:4.25,acBudg:204.8,mesBudg:5.8,varEur:-22.5,varPct:-10.7},
+    aum:{real:79.4,budget:102.3,acReal:82.048,mesReal:-1.908,acBudg:90.775,mesBudg:11.519,varEur:-8.727,varPct:-9.6},
+    ingresos:{acReal:743.438,mesReal:190.0,ytdReal:933.4,acBudg:1018.171,mesBudg:355.147,ytdBudg:1373.3,varEur:-274.733,varPct:-27.0},
+    gastos:{acReal:-99.225,mesReal:-25.0,ytdReal:124.2,acBudg:-230.225,mesBudg:-81.046,ytdBudg:311.3,varEur:131.0,varPct:56.9},
+    ingNetos:{acReal:644.213,mesReal:165.0,ytdReal:809.2,acBudg:787.946,mesBudg:274.101,ytdBudg:1062.0,varEur:-143.733,varPct:-18.2},
+    monthly:{
+      aum:{
+        budget:[86.9,85.4,86.9,90.8,102.3,114.8,122.6,123.0,125.1,128.2,135.1,136.4],
+        real:  [79.4,79.2,82.1,82.0,null,null,null,null,null,null,null,null]
+      },
+      ingresos:{
+        budget:[242.5,206.4,358.0,211.2,355.1,254.2,410.2,337.7,308.6,335.5,604.7,412.4],
+        real:  [174.3,215.0,172.5,181.6,null,null,null,null,null,null,null,null]
+      },
+      gastos:{
+        budget:[57.7,41.3,98.8,32.4,81.0,31.9,113.3,41.5,59.6,71.8,189.8,116.3],
+        real:  [23.7,38.9,16.7,20.0,null,null,null,null,null,null,null,null]
+      }
+    },
+    nota:'€139k en comisiones pendientes de cobro que se cobrarán al traspasar activos a Vera. Cierre Vera previsto 19/05/2026.',
+    stats:{nProgramas:89,tamMedio:'€2.16M',consumo:'45%',nuevasDisp:'€7.9M'},
+    nuevosProgs:[{cliente:'Espa',importe:'€1.5M',estado:'TS Firmado'},{cliente:'Salesland',importe:'€0.75M',estado:'TS Firmado'},{cliente:'Assista Casa',importe:'€1.5M',estado:'En análisis'},{cliente:'Magna',importe:'€0.5M',estado:'En análisis'}]
+  },
+  vera:{
+    color:'#16A085',estado:'cierre_proceso',name:'Vera',tipo:'pag',tipoLabel:'Pagarés financieros',
+    manager:'Fran Campos',inicio:'May 2026',fin:'Rotativo',
+    estrategia:'Descuento de pagarés financieros a corto plazo. Fondo en proceso de cierre — previsto 19/05/2026.',
+    tir:null,tirObj:9.5,moic:null,dpi:null,capStruct:null,
+    aum:{real:0.0,budget:0.0,acReal:0.0,mesReal:0.0,acBudg:0.0,mesBudg:0.0,varEur:0.0,varPct:0},
+    ingresos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    gastos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    ingNetos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    nota:'Fondo en proceso de cierre. AUM objetivo: €150M. Previsto: 19/05/2026. MUFG y Pollen confirmados.',
+    pipeline:[]
+  },
+  ronda:{
+    color:'#3B6D11',name:'Ronda',tipo:'fac',tipoLabel:'Factoring',
+    manager:'Gonzalo de la Rosa-Degrelle',inicio:'Mar 2022',fin:'Rotativo',
+    estrategia:'Factoring de facturas comerciales. Vehículo rotativo, plazo medio 30-60 días. Deudores de primer orden.',
+    tir:10.1,tirObj:9.5,moic:null,dpi:null,capStruct:null,
+    aum:{real:55.0,budget:70.4,acReal:49.579,mesReal:5.421,acBudg:65.221,mesBudg:5.225,varEur:-15.642,varPct:-24.0},
+    ingresos:{acReal:234.217,mesReal:65.362,ytdReal:299.6,acBudg:357.21,mesBudg:110.917,ytdBudg:468.1,varEur:-122.993,varPct:-34.4},
+    gastos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    ingNetos:{acReal:234.217,mesReal:65.362,ytdReal:299.6,acBudg:357.21,mesBudg:110.917,ytdBudg:468.1,varEur:-122.993,varPct:-34.4},
+    monthly:{
+      aum:{
+        budget:[54.5,56.1,60.1,65.2,70.4,78.4,88.8,96.1,105.6,114.9,124.2,143.9],
+        real:  [42.3,45.7,49.6,49.6,null,null,null,null,null,null,null,null]
+      },
+      ingresos:{
+        budget:[83.7,77.0,92.4,104.1,110.9,132.6,156.7,152.2,173.3,184.6,196.0,266.1],
+        real:  [54.5,53.3,64.5,61.8,null,null,null,null,null,null,null,null]
+      },
+      gastos:{
+        budget:[0,0,0,0,0,0,0,0,0,0,0,0],
+        real:  [0,0,0,0,null,null,null,null,null,null,null,null]
+      }
+    },
+    nota:null,
+    pipeline:[
+      {cliente:'Novartis',importe:'€35.0M',fecha:'Mayo',estado:'Firma adenda mayo'},
+      {cliente:'IQVIA',importe:'€0.8M',fecha:'14/05',estado:'Firma prevista'},
+      {cliente:'Elekta',importe:'€5.4M',fecha:'Mayo',estado:'Pendiente fecha firma'},
+      {cliente:'IQVIA',importe:'€14.0M',fecha:'Mayo',estado:'Finales mayo, sin confirmar'},
+      {cliente:'Siemens',importe:'€20.0M',fecha:'Junio',estado:'Cotización 14/05'},
+      {cliente:'Drager',importe:'€90.0M',fecha:'Julio',estado:'En negociación'}
+    ],
+    dealsCerrados:143.9
+  },
+  alameda:{
+    color:'#475569',name:'Alameda',tipo:'lp',tipoLabel:'Largo plazo',
+    manager:'Regina Arrinda',inicio:'Mar 2022',fin:'Mar 2032',
+    estrategia:'Deuda de proyecto en energías renovables (solar PV y eólico). Préstamos a largo plazo.',
+    tir:13.1,tirObj:12.0,moic:1.20,dpi:0.06,
+    capStruct:{equity:30,mezz:0,deuda:70},
+    aum:{real:16.3,budget:54.6,acReal:5.7,mesReal:10.6,acBudg:49.648,mesBudg:4.935,varEur:-43.948,varPct:-88.5},
+    ingresos:{acReal:18.999,mesReal:5.0,ytdReal:24.0,acBudg:512.433,mesBudg:161.138,ytdBudg:134.7,varEur:-493.434,varPct:-96.3},
+    gastos:{acReal:-14.688,mesReal:-3.025,ytdReal:17.7,acBudg:-192.96,mesBudg:-54.44,ytdBudg:0.0,varEur:178.272,varPct:92.4},
+    ingNetos:{acReal:4.311,mesReal:1.975,ytdReal:6.3,acBudg:319.473,mesBudg:106.698,ytdBudg:134.7,varEur:-315.162,varPct:-98.7},
+    monthly:{
+      aum:{
+        budget:[21,21,38,50,55,72,83,89,109,113,119,134],
+        real:  [5.7,5.7,5.7,5.7,null,null,null,null,null,null,null,null]
+      },
+      ingresos:{
+        budget:[16,16,187,294,161,270,215,126,155,85,185,154],
+        real:  [4.9,4.4,4.9,4.8,null,null,null,null,null,null,null,null]
+      },
+      gastos:{
+        budget:[0,0,88.5,104.4,54.4,91.9,86.4,31.9,61.4,0,58.9,96.2],
+        real:  [3.6,3.6,2.0,5.6,null,null,null,null,null,null,null,null]
+      }
+    },
+    nota:null,
+    stats:{firmado:'€29.5M',dispuesto:'19%',pipeline:'€146.4M'},
+    pipeline:[
+      {cliente:'RIC (Blue Energy Sun)',importe:'€29.5M',estado:'Activo · 2ª disp. €10.6M desde 12/05'},
+      {cliente:'Greenalia Wind Power',importe:'€17.3M',estado:'Pendiente firma · recurso contencioso jul'},
+      {cliente:'Altano',importe:'€90.0M',estado:'Pipeline · términos enviados'},
+      {cliente:'Dunas',importe:'€16.6M',estado:'On hold · pdte. aprobación comité'},
+      {cliente:'Enerland',importe:'€25.3M',estado:'On hold · parado'},
+      {cliente:'Fusgar',importe:'€14.5M',estado:'On hold · buscan deuda'}
+    ]
+  },
+  belmonte:{
+    color:'#8E44AD',estado:'proximo',name:'Belmonte',tipo:'lp',tipoLabel:'Largo plazo',
+    manager:'Luis Torroba',inicio:'Sep 2023',fin:'Sep 2033',
+    estrategia:'Direct lending. Fondo en fase de inversión inicial. Sin cartera activa en el período.',
+    tir:null,tirObj:13.0,moic:null,dpi:null,
+    capStruct:{equity:50,mezz:0,deuda:50},
+    aum:{real:0.0,budget:0.0,acReal:0.0,mesReal:0.0,acBudg:0.0,mesBudg:0.0,varEur:0.0,varPct:0},
+    ingresos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:200.0,mesBudg:0.0,ytdBudg:200.0,varEur:-200.0,varPct:-100.0},
+    gastos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:0.0,mesBudg:0.0,ytdBudg:0.0,varEur:0.0,varPct:0},
+    ingNetos:{acReal:0.0,mesReal:0.0,ytdReal:0.0,acBudg:200.0,mesBudg:0.0,ytdBudg:200.0,varEur:-200.0,varPct:-100.0},
+    monthly:{
+      aum:{
+        budget:[0,0,0,0,0,30,46,62,78,93.9,109.9,125.9],
+        real:  [0,0,0,0,null,null,null,null,null,null,null,null]
+      },
+      ingresos:{
+        budget:[0,0,200,0,0,21.9,33.6,56.6,68.9,68.6,100.4,92.0],
+        real:  [0,0,0,0,null,null,null,null,null,null,null,null]
+      },
+      gastos:{
+        budget:[0,0,0,0,0,0,0,0,0,0,0,0],
+        real:  [0,0,0,0,null,null,null,null,null,null,null,null]
+      }
+    },
+    nota:'Sin actividad en el período.',
+    pipeline:[]
+  }
+};
+const ORDER=['triana','alcantara','ronda','alameda','vera','belmonte'];
+let charts={};
+
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function allDc(){Object.keys(charts).forEach(id=>dc(id));}
+function vp(pct){if(pct===null||pct===undefined)return'—';const c=pct>=0?'var-pos':'var-neg';return`<span class="var-pill ${c}">${pct>=0?'+':''}${pct}%</span>`;}
+function vc(v){return v>=0?'up':'dn';}
+function fmtN(n){return Math.abs(Math.round(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');} function fK(v){if(v===null||v===undefined)return'—';return'€'+fmtN(v)+'k';}
+function fM(v){if(v===null||v===undefined||v===0)return'€0M';return'€'+v.toFixed(1)+'Mn';}
+function dc_(t){return t==='lp'?'#185FA5':t==='pag'?'#534AB7':'#3B6D11';}
+function dbg(t){return t==='lp'?'#E6F1FB':t==='pag'?'#EEEDFE':'#EAF3DE';}
+function dtc(t){return t==='lp'?'#0C447C':t==='pag'?'#3C3489':'#27500A';}
+
+function showPage(id,el){
+  allDc();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(id==='overview')renderOverview();
+  if(id==='budget')renderBudget('total');
+  if(id==='docs')renderDocs(null);
+}
+function showFund(id,el){
+  allDc();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-fund').classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderFund(id);
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────
+// ── TRIANA PORTFOLIO DATA (real, abril 2026) ──────────────────────
+const TRIANA_LOANS = [{"issuer": "Imenergy Power Plant, S.L.", "orig": 5000000, "curr": 3125000, "maturity": "13/05/2028", "sector": "Ingeniería", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "B+", "nextPay": 76824, "capDue": 0, "intDue": 76824}, {"issuer": "One Shot Equity, S.L.", "orig": 3000000, "curr": 1920000, "maturity": "16/05/2028", "sector": "Hostelería", "region": "Madrid", "ratingEth": "B", "ratingCurr": "B-", "nextPay": 229812, "capDue": 180000, "intDue": 49812}, {"issuer": "Transnugon, S.L.", "orig": 2500000, "curr": 1125000, "maturity": "16/05/2028", "sector": "Logística", "region": "Valencia", "ratingEth": "B", "ratingCurr": "B-", "nextPay": 153619, "capDue": 125000, "intDue": 28619}, {"issuer": "Hemisferio Verde, S.L.", "orig": 2570000, "curr": 2544300, "maturity": "16/06/2028", "sector": "Distribución", "region": "Catalonia", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 90968, "capDue": 25700, "intDue": 65268}, {"issuer": "Riba Mundo Tecnología, S.L.", "orig": 6212500, "curr": 3937500, "maturity": "11/07/2028", "sector": "Distribución", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "D", "nextPay": 540216, "capDue": 437500, "intDue": 102716}, {"issuer": "Gold Center Capital S.L.", "orig": 4000000, "curr": 2250000, "maturity": "11/07/2028", "sector": "Distribución", "region": "Madrid", "ratingEth": "B", "ratingCurr": "BB-", "nextPay": 306989, "capDue": 250000, "intDue": 56989}, {"issuer": "Envialia World S.L.", "orig": 10000000, "curr": 10000000, "maturity": "08/08/2028", "sector": "Logística", "region": "Madrid", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 1235850, "capDue": 1000000, "intDue": 235850}, {"issuer": "Dial Partners S.L.", "orig": 3500000, "curr": 1750000, "maturity": "17/10/2028", "sector": "Construcción", "region": "Galicia", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 222523, "capDue": 175000, "intDue": 47523}, {"issuer": "Agropecuaria Santas Masas S.L.", "orig": 4000000, "curr": 2700000, "maturity": "31/10/2028", "sector": "Agroalimentario", "region": "Aragon", "ratingEth": "B", "ratingCurr": "B-", "nextPay": 321760, "capDue": 250000, "intDue": 71760}, {"issuer": "Dental Company Center S.L.", "orig": 2000000, "curr": 2000000, "maturity": "14/11/2027", "sector": "Salud", "region": "Andalucia", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 170500, "capDue": 0, "intDue": 170500}, {"issuer": "Dental Company Center S.L.", "orig": 5000000, "curr": 4500000, "maturity": "14/11/2027", "sector": "Salud", "region": "Andalucia", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 170500, "capDue": 0, "intDue": 170500}, {"issuer": "Riba Mundo Tecnología, S.L.", "orig": 2662500, "curr": 1687500, "maturity": "11/07/2028", "sector": "Distribución", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "D", "nextPay": 231521, "capDue": 187500, "intDue": 44021}, {"issuer": "Grupo Lantania S.L.", "orig": 2500000, "curr": 2500000, "maturity": "01/12/2027", "sector": "Construcción", "region": "Madrid", "ratingEth": "BB", "ratingCurr": "BB-", "nextPay": 55693, "capDue": 0, "intDue": 55693}, {"issuer": "Gold Center, S.L.", "orig": 1500000, "curr": 937500, "maturity": "11/10/2028", "sector": "Distribución", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 117140, "capDue": 93750, "intDue": 23390}, {"issuer": "Bodegas BH S.L.", "orig": 2000000, "curr": 1475000, "maturity": "05/01/2029", "sector": "Agroalimentario", "region": "Extremadura", "ratingEth": "B+", "ratingCurr": "B+", "nextPay": 160875, "capDue": 125000, "intDue": 35875}, {"issuer": "ARCESSO DYNAMICS, S.L.", "orig": 2500000, "curr": 484800, "maturity": "20/01/2029", "sector": "Industrial", "region": "Catalonia", "ratingEth": "B", "ratingCurr": "CCC", "nextPay": 13472, "capDue": 0, "intDue": 13472}, {"issuer": "Sondeos, Estructuras y Geotecnia S…", "orig": 3000000, "curr": 2212500, "maturity": "20/01/2029", "sector": "Ingeniería", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "B+", "nextPay": 246184, "capDue": 187500, "intDue": 58684}, {"issuer": "Agro Indes S.L.", "orig": 1379000, "curr": 879000, "maturity": "25/01/2029", "sector": "Distribución", "region": "Navarra", "ratingEth": "B+", "ratingCurr": "CCC+", "nextPay": 19761, "capDue": 0, "intDue": 19761}, {"issuer": "Agro Indes S.L.", "orig": 1595360, "curr": 595360, "maturity": "25/01/2029", "sector": "Distribución", "region": "Navarra", "ratingEth": "B+", "ratingCurr": "CCC+", "nextPay": 19761, "capDue": 0, "intDue": 19761}, {"issuer": "Opentix S.L. (EUR 2M Loan)", "orig": 2000000, "curr": 2000000, "maturity": "24/01/2028", "sector": "Tecnología", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "B+", "nextPay": 84135, "capDue": 0, "intDue": 84135}, {"issuer": "Opentix S.L. (EUR 1,12M Loan)", "orig": 1120000, "curr": 1120000, "maturity": "24/01/2028", "sector": "Tecnología", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "B+", "nextPay": 84135, "capDue": 0, "intDue": 84135}, {"issuer": "Mirai Advisory S.L.", "orig": 3000000, "curr": 2980000, "maturity": "02/02/2029", "sector": "Tecnología", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 92827, "capDue": 20000, "intDue": 72827}, {"issuer": "Bischoff + Scheck GmBh", "orig": 5000000, "curr": 5000000, "maturity": "17/04/2028", "sector": "Industrial", "region": "Baden-Wuerttemberg", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 110502, "capDue": 0, "intDue": 110502}, {"issuer": "Riba Mundo Tecnología, S.L.", "orig": 787500, "curr": 787500, "maturity": "09/07/2028", "sector": "Distribución", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "D", "nextPay": 7962, "capDue": 0, "intDue": 7962}, {"issuer": "Riba Mundo Tecnología, S.L.", "orig": 337500, "curr": 337500, "maturity": "09/07/2028", "sector": "Distribución", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "D", "nextPay": 3412, "capDue": 0, "intDue": 3412}];
+const TRIANA_SECTORS = [{"s": "Distribución", "v": 13956}, {"s": "Logística", "v": 11125}, {"s": "Salud", "v": 6500}, {"s": "Tecnología", "v": 6100}, {"s": "Industrial", "v": 5485}, {"s": "Ingeniería", "v": 5338}, {"s": "Construcción", "v": 4250}, {"s": "Agroalimentario", "v": 4175}, {"s": "Hostelería", "v": 1920}];
+const TRIANA_TOP10 = [{"issuer": "Envialia World S.L.", "orig": 10000000, "curr": 10000000, "maturity": "08/08/2028", "sector": "Logística", "region": "Madrid", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 1235850, "capDue": 1000000, "intDue": 235850}, {"issuer": "Bischoff + Scheck GmBh", "orig": 5000000, "curr": 5000000, "maturity": "17/04/2028", "sector": "Industrial", "region": "Baden-Wuerttemberg", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 110502, "capDue": 0, "intDue": 110502}, {"issuer": "Dental Company Center S.L.", "orig": 5000000, "curr": 4500000, "maturity": "14/11/2027", "sector": "Salud", "region": "Andalucia", "ratingEth": "BB-", "ratingCurr": "BB-", "nextPay": 170500, "capDue": 0, "intDue": 170500}, {"issuer": "Riba Mundo Tecnología, S.L.", "orig": 6212500, "curr": 3937500, "maturity": "11/07/2028", "sector": "Distribución", "region": "Valencia", "ratingEth": "BB-", "ratingCurr": "D", "nextPay": 540216, "capDue": 437500, "intDue": 102716}, {"issuer": "Imenergy Power Plant, S.L.", "orig": 5000000, "curr": 3125000, "maturity": "13/05/2028", "sector": "Ingeniería", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "B+", "nextPay": 76824, "capDue": 0, "intDue": 76824}, {"issuer": "Mirai Advisory S.L.", "orig": 3000000, "curr": 2980000, "maturity": "02/02/2029", "sector": "Tecnología", "region": "Madrid", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 92827, "capDue": 20000, "intDue": 72827}, {"issuer": "Agropecuaria Santas Masas S.L.", "orig": 4000000, "curr": 2700000, "maturity": "31/10/2028", "sector": "Agroalimentario", "region": "Aragon", "ratingEth": "B", "ratingCurr": "B-", "nextPay": 321760, "capDue": 250000, "intDue": 71760}, {"issuer": "Hemisferio Verde, S.L.", "orig": 2570000, "curr": 2544300, "maturity": "16/06/2028", "sector": "Distribución", "region": "Catalonia", "ratingEth": "B+", "ratingCurr": "BB-", "nextPay": 90968, "capDue": 25700, "intDue": 65268}, {"issuer": "Grupo Lantania S.L.", "orig": 2500000, "curr": 2500000, "maturity": "01/12/2027", "sector": "Construcción", "region": "Madrid", "ratingEth": "BB", "ratingCurr": "BB-", "nextPay": 55693, "capDue": 0, "intDue": 55693}, {"issuer": "Gold Center Capital S.L.", "orig": 4000000, "curr": 2250000, "maturity": "11/07/2028", "sector": "Distribución", "region": "Madrid", "ratingEth": "B", "ratingCurr": "BB-", "nextPay": 306989, "capDue": 250000, "intDue": 56989}];
+const TRIANA_TOTAL = 58848460;
+
+const ALC_TOP10=[{"name": "DESARROLLOS AGRO INTENSIVOS, SOCIEDAD LI", "ob": 5.0, "notes": 10, "pct": 6.1}, {"name": "GRUPO LANTANIA SA", "ob": 4.75, "notes": 10, "pct": 5.8}, {"name": "GREENALIA, SA", "ob": 4.5, "notes": 9, "pct": 5.5}, {"name": "FREMONT-BLUESPACE SLU", "ob": 4.5, "notes": 4, "pct": 5.5}, {"name": "GRUPO INMOBILIARIO FERROCARRIL SA", "ob": 3.6, "notes": 5, "pct": 4.4}, {"name": "INTERNACIONAL DE ALCOHOLES SA", "ob": 3.1, "notes": 11, "pct": 3.8}, {"name": "ACEITES ABASA SAU", "ob": 2.981, "notes": 6, "pct": 3.6}, {"name": "RIC ENERGY HOLDINGS SL", "ob": 2.9, "notes": 5, "pct": 3.5}, {"name": "TERRANOVA LAND SL.", "ob": 2.9, "notes": 5, "pct": 3.5}, {"name": "PROMO MELGA SL", "ob": 2.67, "notes": 5, "pct": 3.3}];
+const ALC_RATINGS=[["Baa2", 4.5], ["Baa3", 6.5], ["Ba1", 19.94], ["Ba2", 28.098], ["Ba3", 14.538], ["B1", 5.525], ["B2", 1.425], ["B3", 1.522]];
+const ALC_SECTORS=[{"cnae": "484", "sector": "Distribución farmacéutica", "ob": 20.268, "pct": 24.7}, {"cnae": "331", "sector": "Ingeniería/Maquinaria", "ob": 6.547, "pct": 8.0}, {"cnae": "555", "sector": "Hostelería", "ob": 6.0, "pct": 7.3}, {"cnae": "12", "sector": "Tabaco/Agro", "ob": 5.0, "pct": 6.1}, {"cnae": "549", "sector": "Energía renovable", "ob": 4.5, "pct": 5.5}, {"cnae": "510", "sector": "Agro/Alimentación", "ob": 4.16, "pct": 5.1}, {"cnae": "503", "sector": "Inmobiliario", "ob": 3.6, "pct": 4.4}, {"cnae": "378", "sector": "Química", "ob": 3.1, "pct": 3.8}, {"cnae": "554", "sector": "Restauración", "ob": 2.981, "pct": 3.6}, {"cnae": "513", "sector": "Energía", "ob": 2.9, "pct": 3.5}, {"cnae": "551", "sector": "Consultoría", "ob": 2.5, "pct": 3.0}, {"cnae": "310", "sector": "Muebles/Madera", "ob": 2.0, "pct": 2.4}, {"cnae": "446", "sector": "Distribución", "ob": 2.0, "pct": 2.4}, {"cnae": "26", "sector": "Electrónica", "ob": 1.725, "pct": 2.1}, {"cnae": "473", "sector": "Distribución combustible", "ob": 1.7, "pct": 2.1}, {"cnae": "428", "sector": "Construcción civil", "ob": 1.5, "pct": 1.8}, {"cnae": "351", "sector": "CNAE 351", "ob": 1.172, "pct": 1.4}, {"cnae": "501", "sector": "CNAE 501", "ob": 1.17, "pct": 1.4}, {"cnae": "otros", "sector": "Otros", "ob": 9.325, "pct": 11.4}];
+
+function renderOverview(){
+  allDc();
+  // Update overview KPIs dynamically
+  const _aumR=ORDER.reduce((s,id)=>s+FUNDS[id].aum.real,0);
+  const _aumB=ORDER.reduce((s,id)=>s+FUNDS[id].aum.budget,0);
+  const _ingR=ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.ytdReal,0)+13.2;
+  const _ingB=ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.ytdBudg,0)+50.0;
+  const _gasR=ORDER.reduce((s,id)=>s+FUNDS[id].gastos.ytdReal,0);
+  const _gasB=ORDER.reduce((s,id)=>s+FUNDS[id].gastos.ytdBudg,0);
+  const _netR=ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdReal,0)+13.2;
+  const _netB=ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdBudg,0)+50.0;
+  const _pct=(r,b)=>b?Math.round((r/b-1)*100):0;
+  const el=id=>document.getElementById(id);
+  // Use acReal (april closed) not ytdReal (includes may estimate)
+  const _aumRac =ORDER.reduce((s,id)=>s+(FUNDS[id].aum.acReal||FUNDS[id].aum.real),0);
+  const _aumBac =ORDER.reduce((s,id)=>s+(FUNDS[id].aum.acBudg||FUNDS[id].aum.budget),0);
+  const _ingRac =ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.acReal,0)+13.2;
+  const _ingBac =ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.acBudg,0)+35.0;
+  const _gasRac =ORDER.reduce((s,id)=>s+FUNDS[id].gastos.acReal,0);
+  const _gasBac =ORDER.reduce((s,id)=>s+FUNDS[id].gastos.acBudg,0);
+  const _netRac =ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.acReal,0)+13.2;
+  const _netBac =ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.acBudg,0)+35.0;
+  if(el('ov_aum')){ el('ov_aum').textContent='€'+_aumRac.toFixed(1)+'Mn'; el('ov_aum_sub').textContent='vs €'+_aumBac.toFixed(1)+'Mn budget ac. abril'; }
+  if(el('ov_ing')){ el('ov_ing').textContent='€'+fmtN(_ingRac)+'k'; el('ov_ing_sub').textContent='vs €'+fmtN(_ingBac)+'k budget ac. abril — '+_pct(_ingRac,_ingBac)+'%'; }
+  if(el('ov_gas')){ el('ov_gas').textContent='€'+fmtN(_gasRac)+'k'; el('ov_gas_sub').textContent='vs €'+fmtN(_gasBac)+'k budget ac. abril'; }
+  if(el('ov_net')){ el('ov_net').textContent='€'+fmtN(_netRac)+'k'; el('ov_net_sub').textContent='vs €'+fmtN(_netBac)+'k budget ac. abril — '+_pct(_netRac,_netBac)+'%'; }
+  document.getElementById('fundGrid').innerHTML=ORDER.map(id=>{
+    const f=FUNDS[id];const c=f.color||dc_(f.tipo);const bg=f.color?f.color+'22':dbg(f.tipo);const tc=dtc(f.tipo);
+    const aumPct=f.aum.budget>0?Math.round((f.aum.acReal!=null?f.aum.acReal:f.aum.real)/(f.aum.acBudg!=null?f.aum.acBudg:f.aum.budget)*100):0;
+
+    if(true){
+      const statusMap={'activo':'Activo','cierre_proceso':'En proceso de cierre','proximo':'Próximo lanzamiento','cierre':'En cierre','lanzamiento':'En lanzamiento'};
+      const statusColor={'activo':'var(--success)','cierre_proceso':'var(--warning)','proximo':'#2980B9','cierre':'var(--warning)','lanzamiento':'#2980B9'};
+      const statusBg={'activo':'var(--success-lt)','cierre_proceso':'var(--warning-lt)','proximo':'var(--info-lt)','cierre':'var(--warning-lt)','lanzamiento':'var(--info-lt)'};
+      const estado=f.estado||'activo';
+      const aumVal=f.aum.acReal!=null?f.aum.acReal:f.aum.real;
+      const aumBudg=f.aum.acBudg!=null?f.aum.acBudg:f.aum.budget;
+      const aumPct=aumBudg>0?Math.min(Math.round(aumVal/aumBudg*100),100):0;
+      return `<div class="fund-card" onclick="showFund('${id}',null)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="fc-dot" style="background:${c};width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:2px"></span>
+            <div class="fc-name" style="font-size:16px;font-weight:700">${f.name}</div>
+          </div>
+          <span style="padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:${statusBg[estado]};color:${statusColor[estado]};white-space:nowrap">${statusMap[estado]||'Activo'}</span>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <span class="fc-badge" style="background:${bg};color:${tc}">${f.tipoLabel}</span>
+          <span style="font-size:11px;color:var(--gray-400);padding:2px 8px;border-radius:10px;background:var(--gray-50)">${f.inicio} → ${f.fin}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray-600);margin-bottom:14px;line-height:1.5;min-height:36px">${f.estrategia}</div>
+        <div class="fc-divider"></div>
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+            <span style="font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em">AUM ac. abril</span>
+            <span style="font-size:11px;color:var(--gray-400)">${aumPct}% del objetivo</span>
+          </div>
+          <div style="font-size:22px;font-weight:700;color:${c};margin-bottom:6px">${fM(aumVal)}</div>
+          <div style="height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden;margin-bottom:4px">
+            <div style="height:100%;width:${aumPct}%;background:${c};border-radius:3px"></div>
+          </div>
+          <div style="font-size:11px;color:var(--gray-400)">Objetivo: ${fM(aumBudg)}</div>
+        </div>
+        <div class="fc-divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">TIR bruta</div>
+            <div style="font-size:15px;font-weight:700">${f.tir!=null?f.tir.toFixed(1)+'%':'—'}</div>
+          </div>
+          <div style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">
+            <div style="font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">TIR neta</div>
+            <div style="font-size:15px;font-weight:700">${f.tirNeta!=null?f.tirNeta.toFixed(1)+'%':'—'}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">MOIC</div>
+            <div style="font-size:15px;font-weight:700">${f.moic!=null?f.moic.toFixed(2)+'x':'—'}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  }).join('');
+
+  // AUM Evolution Chart
+  const AUM_LABELS=["Jun '22", "Jul '22", "Ago '22", "Sep '22", "Oct '22", "Nov '22", "Dic '22", "Ene '23", "Feb '23", "Mar '23", "Abr '23", "May '23", "Jun '23", "Jul '23", "Ago '23", "Sep '23", "Oct '23", "Nov '23", "Dic '23", "Ene '24", "Feb '24", "Mar '24", "Abr '24", "May '24", "Jun '24", "Jul '24", "Ago '24", "Sep '24", "Oct '24", "Nov '24", "Dic '24", "Ene '25", "Feb '25", "Mar '25", "Abr '25", "May '25", "Jun '25", "Jul '25", "Ago '25", "Sep '25", "Oct '25", "Nov '25", "Dic '25", "Ene '26", "Feb '26", "Mar '26", "Abr '26"];
+  const AUM_TRIANA=[33.07, 71.12, 78.61, 84.3, 91.8, 116.09, 156.59, 183.19, 195.38, 193.69, 198.69, 192.49, 192.39, 192.39, 192.06, 191.96, 191.96, 191.64, 188.41, 188.24, 179.31, 179.0, 178.92, 178.79, 178.29, 168.07, 157.27, 144.85, 143.66, 140.48, 137.6, 136.16, 126.24, 123.88, 122.74, 122.07, 121.7, 109.38, 102.37, 89.78, 88.64, 88.02, 91.34, 85.97, 80.66, 61.07, 58.85];
+  const AUM_ALCANT=[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 7.2, 10.15, 11.0, 21.45, 40.7, 40.7, 63.85, 67.6, 71.35, 79.87, 79.87, 77.27, 82.97, 76.67, 84.92, 80.07, 81.19, 81.29, 81.86, 83.51, 77.84, 80.52, 79.4, 79.2, 82.07, 82.05];
+  const AUM_RONDA=[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.65, 2.37, 2.65, 4.71, 11.78, 14.09, 18.44, 19.41, 19.92, 22.78, 18.97, 37.79, 55.39, 42.26, 45.72, 49.61, 49.58];
+  const AUM_ALAMEDA=[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 5.7, 5.7, 5.7, 5.7];
+  const AUM_TOTAL=[33.1, 71.1, 78.6, 84.3, 91.8, 116.1, 156.6, 183.2, 195.4, 193.7, 198.7, 192.5, 192.4, 192.4, 192.1, 192.0, 192.0, 191.6, 188.4, 188.2, 179.3, 186.2, 189.1, 189.8, 199.7, 208.8, 198.0, 208.7, 211.3, 211.8, 221.1, 218.4, 206.2, 211.6, 211.2, 221.1, 220.2, 210.0, 203.6, 194.4, 191.1, 203.7, 227.2, 213.3, 211.3, 198.4, 196.2];
+  setTimeout(()=>{
+    const ctx=document.getElementById('aumEvolutionChart');
+    if(!ctx) return;
+    dc('aumEvo');
+    charts.aumEvo=new Chart(ctx,{type:'line',data:{labels:AUM_LABELS,datasets:[
+      {label:'Triana',data:AUM_TRIANA,borderColor:'#185FA5',borderWidth:2,pointRadius:1,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+      {label:'Alcántara',data:AUM_ALCANT,borderColor:'#534AB7',borderWidth:2,pointRadius:1,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+      {label:'Ronda',data:AUM_RONDA,borderColor:'#3B6D11',borderWidth:2,pointRadius:1,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+      {label:'Alameda',data:AUM_ALAMEDA,borderColor:'#475569',borderWidth:2,pointRadius:1,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+      {label:'Total',data:AUM_TOTAL,borderColor:'#1a1a1a',borderWidth:2.5,borderDash:[5,3],pointRadius:1,pointHoverRadius:4,tension:0.3,fill:false,spanGaps:true},
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y!=null?` ${c.dataset.label}: €${c.parsed.y.toFixed(1)}Mn`:''}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},maxTicksLimit:16,maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}},beginAtZero:true}}
+    }});
+  },200);
+}
+
+// ── BUDGET ────────────────────────────────────────────────────────
+function renderBudget(tab){
+  allDc();
+  const tabs=[{id:'total',label:'Consolidado'},...ORDER.map(id=>({id,label:FUNDS[id].name}))];
+  document.getElementById('budgetTabs').innerHTML=tabs.map(t=>
+    `<button class="budget-tab ${t.id===tab?'active':''}" onclick="renderBudget('${t.id}')">${t.label}</button>`
+  ).join('');
+  if(tab==='total') renderBudgetTotal();
+  else renderBudgetFund(tab);
+}
+
+const TH=`<thead><tr>
+  <th style="min-width:180px"></th>
+  <th>Ac. abril real</th><th>Mayo est.</th><th>YTD est.</th>
+  <th>Ac. abr. budget</th><th>Mayo budget</th><th>YTD budget</th>
+  <th>Var. €</th><th>Var. %</th>
+</tr></thead>`;
+
+function fundBudgetRows(id){
+  const f=FUNDS[id];const c=dc_(f.tipo);
+  let rows=`<tr class="fund-group-header"><td colspan="9">
+    <span style="display:inline-flex;align-items:center;gap:6px">
+      <span style="width:7px;height:7px;border-radius:50%;background:${c};display:inline-block"></span>
+      ${f.name} — ${f.tipoLabel}
+    </span>
+  </td></tr>`;
+
+  const aRow=(lbl,d,pad=16,isGasto=false)=>{
+    const signEur=d.varEur>=0?'+':'';
+    const cls=isGasto?(d.varEur<=0?'up':'dn'):vc(d.varEur);
+    const fmt=(v)=>isGasto&&v>0?'('+v.toFixed(1)+')':v.toFixed(1);
+    return `<tr>
+      <td style="padding-left:${pad}px;color:var(--gray-600)">${lbl}</td>
+      <td>${fmt(d.acReal)}</td><td>${fmt(d.mesReal)}</td><td style="font-weight:600">${fmt(d.ytdReal)}</td>
+      <td style="color:var(--gray-400)">${fmt(d.acBudg)}</td><td style="color:var(--gray-400)">${fmt(d.mesBudg)}</td><td style="color:var(--gray-400)">${fmt(d.ytdBudg)}</td>
+      <td class="${cls}">${signEur}${d.varEur.toFixed(1)}</td><td>${vp(d.varPct)}</td>
+    </tr>`;
+  };
+
+  rows+=`<tr><td style="padding-left:16px;color:var(--gray-600)">AUM (€M)</td>
+    <td>${f.aum.acReal!=null?f.aum.acReal.toFixed(1):'—'}</td>
+    <td>${f.aum.mesReal!=null?f.aum.mesReal.toFixed(1):'—'}</td>
+    <td style="font-weight:600">${f.aum.real.toFixed(1)}</td>
+    <td style="color:var(--gray-400)">${f.aum.acBudg!=null?f.aum.acBudg.toFixed(1):'—'}</td>
+    <td style="color:var(--gray-400)">${f.aum.mesBudg!=null?f.aum.mesBudg.toFixed(1):'—'}</td>
+    <td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
+    <td class="${vc(f.aum.varEur)}">${f.aum.varEur>=0?'+':''}${f.aum.varEur.toFixed(1)}</td><td>${vp(f.aum.varPct)}</td></tr>`;
+
+  if(id==='alcantara'&&f.progFirmados){
+    rows+=`<tr><td style="padding-left:16px;color:var(--gray-600)">Imp. prog. firmados (€M)</td>
+      <td>${f.progFirmados.acReal!=null?f.progFirmados.acReal.toFixed(1):"—"}</td><td>${f.progFirmados.mesReal!=null?f.progFirmados.mesReal.toFixed(1):"—"}</td><td style="font-weight:600">${f.progFirmados.real.toFixed(1)}</td>
+      <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
+      <td class="${vc(f.progFirmados.varEur)}">${f.progFirmados.varEur>=0?'+':''}${f.progFirmados.varEur.toFixed(1)}</td><td>${vp(f.progFirmados.varPct)}</td></tr>`;
+  }
+
+  rows+=aRow('Ingresos (€k)',f.ingresos);
+  if(f.gastos.ytdReal>0||f.gastos.ytdBudg>0) rows+=aRow('Gastos (€k)',f.gastos,16,true);
+  rows+=`<tr style="border-bottom:2px solid var(--gray-100)">
+    <td style="padding-left:16px;font-weight:700">Ingresos netos (€k)</td>
+    <td style="font-weight:600">${f.ingNetos.acReal.toFixed(1)}</td><td style="font-weight:600">${f.ingNetos.mesReal.toFixed(1)}</td><td style="font-weight:700">${f.ingNetos.ytdReal.toFixed(1)}</td>
+    <td style="color:var(--gray-400)">${f.ingNetos.acBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingNetos.mesBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingNetos.ytdBudg.toFixed(1)}</td>
+    <td class="${vc(f.ingNetos.varEur)}">${f.ingNetos.varEur>=0?'+':''}${f.ingNetos.varEur.toFixed(1)}</td><td>${vp(f.ingNetos.varPct)}</td></tr>`;
+  return rows;
+}
+
+function renderBudgetTotal(){
+  const totNet={
+    acReal:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.acReal,0),
+    mesReal:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.mesReal,0),
+    ytdReal:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdReal,0),
+    acBudg:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.acBudg,0),
+    mesBudg:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.mesBudg,0),
+    ytdBudg:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdBudg,0),
+    varEur:ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.varEur,0),
+  };
+  totNet.varPct=totNet.ytdBudg>0?Math.round((totNet.ytdReal/totNet.ytdBudg-1)*100):0;
+
+  let html=`
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">AUM total real</div><div class="kpi-value">€${ORDER.reduce((s,id)=>s+(FUNDS[id].aum.acReal!=null?FUNDS[id].aum.acReal:FUNDS[id].aum.real),0).toFixed(1)}Mn</div><div class="kpi-sub dn">vs €${ORDER.reduce((s,id)=>s+(FUNDS[id].aum.acBudg!=null?FUNDS[id].aum.acBudg:FUNDS[id].aum.budget),0).toFixed(1)}M budget ac. abril</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ingresos brutos ac. abril</div><div class="kpi-value">€${(ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.ytdReal,0)+13.2).toFixed(0)}k</div><div class="kpi-sub dn">vs €${(ORDER.reduce((s,id)=>s+FUNDS[id].ingresos.ytdBudg,0)+50.0).toFixed(0)}k budget</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gastos ac. abril</div><div class="kpi-value">€${ORDER.reduce((s,id)=>s+FUNDS[id].gastos.ytdReal,0).toFixed(0)}k</div><div class="kpi-sub up">vs €${ORDER.reduce((s,id)=>s+FUNDS[id].gastos.ytdBudg,0).toFixed(0)}k budget</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ing. netos ac. abril</div><div class="kpi-value">€${(ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdReal,0)+13.2).toFixed(0)}k</div><div class="kpi-sub dn">vs €${(ORDER.reduce((s,id)=>s+FUNDS[id].ingNetos.ytdBudg,0)+50.0).toFixed(0)}k budget</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title">Todos los fondos — Real vs budget 2026 (€k salvo AUM en €M)</div>
+    <div class="tbl-wrap"><table>${TH}<tbody>
+      ${ORDER.map(id=>fundBudgetRows(id)).join('')}
+      <tr class="total-row">
+        <td>TOTAL INGRESOS NETOS <span style="font-weight:400;font-size:11px;color:#888">(incl. Otros)</span></td>
+        <td>${(totNet.acReal+13.2).toFixed(1)}</td>
+        <td>${(totNet.mesReal+0).toFixed(1)}</td>
+        <td>${(totNet.ytdReal+13.2).toFixed(1)}</td>
+        <td>${(totNet.acBudg+35.0).toFixed(1)}</td>
+        <td>${(totNet.mesBudg+15.0).toFixed(1)}</td>
+        <td>${(totNet.ytdBudg+50.0).toFixed(1)}</td>
+        <td class="dn">${((totNet.ytdReal+13.2)-(totNet.ytdBudg+50.0)).toFixed(1)}</td>
+        <td>${vp(Math.round(((totNet.ytdReal+13.2)/(totNet.ytdBudg+50.0)-1)*1000)/10)}</td>
+      </tr>
+    </tbody></table></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">AUM real vs budget por fondo (€M)</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--gray-400)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#185FA5;display:inline-block"></span>Real</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B5D4F4;display:inline-block"></span>Budget</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="bAum"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ingresos netos YTD vs budget (€k)</div>
+      <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--gray-400)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#185FA5;display:inline-block"></span>Real</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:#B5D4F4;display:inline-block"></span>Budget</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="bIng"></canvas></div>
+    </div>
+  </div>`;
+
+  document.getElementById('budgetContent').innerHTML=html;
+  setTimeout(()=>{
+    charts.ba=new Chart(document.getElementById('bAum'),{type:'bar',
+      data:{labels:ORDER.map(id=>FUNDS[id].name),datasets:[
+        {label:'Real',data:ORDER.map(id=>FUNDS[id].aum.real),backgroundColor:'#185FA5',borderWidth:0,borderRadius:4},
+        {label:'Budget',data:ORDER.map(id=>FUNDS[id].aum.budget),backgroundColor:'#B5D4F4',borderWidth:0,borderRadius:4}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:11}}}}}
+    });
+    charts.bi=new Chart(document.getElementById('bIng'),{type:'bar',
+      data:{labels:ORDER.map(id=>FUNDS[id].name),datasets:[
+        {label:'Real',data:ORDER.map(id=>FUNDS[id].ingNetos.ytdReal),backgroundColor:'#185FA5',borderWidth:0,borderRadius:4},
+        {label:'Budget',data:ORDER.map(id=>FUNDS[id].ingNetos.ytdBudg),backgroundColor:'#B5D4F4',borderWidth:0,borderRadius:4}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'k',font:{size:11}}}}}
+    });
+  },100);
+}
+
+function renderBudgetFund(id){
+  const f=FUNDS[id];const c=f.color||dc_(f.tipo);const bg=f.color?f.color+'22':dbg(f.tipo);const tc=dtc(f.tipo);
+  let html=`
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">AUM real (abr)</div><div class="kpi-value">${f.aum.acReal!=null?fM(f.aum.acReal):fM(f.aum.real)}</div><div class="kpi-sub ${vc(f.aum.varPct)}">vs ${f.aum.acBudg!=null?fM(f.aum.acBudg):fM(f.aum.budget)} budget</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ingresos ac. abril</div><div class="kpi-value">${fK(f.ingresos.acReal)}</div><div class="kpi-sub ${vc(f.ingresos.varPct)}">vs ${fK(f.ingresos.acBudg)} budget · ${f.ingresos.varPct>0?'+':''}${f.ingresos.varPct}%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gastos ac. abril</div><div class="kpi-value">${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</div><div class="kpi-sub neu">${f.gastos.acBudg!=null&&f.gastos.acBudg!==0?'Budget '+fK(Math.abs(f.gastos.acBudg)):'Sin gastos asignados'}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ing. netos ac. abril</div><div class="kpi-value">${fK(f.ingNetos.acReal)}</div><div class="kpi-sub ${vc(f.ingNetos.varPct)}">vs ${fK(f.ingNetos.acBudg)} budget · ${f.ingNetos.varPct>0?'+':''}${f.ingNetos.varPct}%</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">${f.name} — <span class="badge" style="background:${bg};color:${tc}">${f.tipoLabel}</span> &nbsp; Real vs budget 2026 (€k salvo AUM en €M)</div>
+    <div class="tbl-wrap"><table>${TH}<tbody>
+      <tr><td style="font-weight:600">AUM (€M)</td><td>—</td><td>—</td><td style="font-weight:700">${f.aum.real.toFixed(1)}</td>
+        <td style="color:var(--gray-400)">—</td><td style="color:var(--gray-400)">—</td><td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
+        <td class="${vc(f.aum.varEur)}">${f.aum.varEur>=0?'+':''}${f.aum.varEur.toFixed(1)}</td><td>${vp(f.aum.varPct)}</td></tr>
+      ${id==='alcantara'&&f.progFirmados?`<tr><td style="font-weight:600">Imp. prog. firmados (€M)</td><td>${f.progFirmados.acReal!=null?f.progFirmados.acReal.toFixed(1):"—"}</td><td>${f.progFirmados.mesReal!=null?f.progFirmados.mesReal.toFixed(1):"—"}</td><td style="font-weight:700">${f.progFirmados.real.toFixed(1)}</td>
+        <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
+        <td class="${vc(f.progFirmados.varEur)}">${f.progFirmados.varEur>=0?'+':''}${f.progFirmados.varEur.toFixed(1)}</td><td>${vp(f.progFirmados.varPct)}</td></tr>`:''}
+      <tr><td style="font-weight:600">Ingresos (€k)</td>
+        <td>${f.ingresos.acReal!=null?fK(f.ingresos.acReal):'—'}</td><td>${f.ingresos.mesReal!=null?fK(f.ingresos.mesReal):'—'}</td><td style="font-weight:700">${f.ingresos.ytdReal.toFixed(1)}</td>
+        <td style="color:var(--gray-400)">${f.ingresos.acBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.mesBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.ytdBudg.toFixed(1)}</td>
+        <td class="${vc(f.ingresos.varEur)}">${f.ingresos.varEur>=0?'+':''}${f.ingresos.varEur.toFixed(1)}</td><td>${vp(f.ingresos.varPct)}</td></tr>
+      ${f.gastos.ytdReal>0||f.gastos.ytdBudg>0?`<tr><td style="font-weight:600">Gastos (€k)</td>
+        <td>${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</td><td>${f.gastos.mesReal!=null&&f.gastos.mesReal!==0?fK(Math.abs(f.gastos.mesReal)):'—'}</td><td style="font-weight:700">${f.gastos.ytdReal!=null&&f.gastos.ytdReal!==0?fK(Math.abs(f.gastos.ytdReal)):'—'}</td>
+        <td style="color:var(--gray-400)">${f.gastos.acBudg!=null&&f.gastos.acBudg!==0?fK(Math.abs(f.gastos.acBudg)):'—'}</td><td style="color:var(--gray-400)">${f.gastos.mesBudg>0?'('+f.gastos.mesBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.ytdBudg>0?'('+f.gastos.ytdBudg.toFixed(1)+')':'—'}</td>
+        <td></td><td></td></tr>`:''}
+      <tr class="total-row"><td>Ingresos netos (€k)</td>
+        <td>${f.ingNetos.acReal.toFixed(1)}</td><td>${f.ingNetos.mesReal.toFixed(1)}</td><td>${f.ingNetos.ytdReal.toFixed(1)}</td>
+        <td>${f.ingNetos.acBudg.toFixed(1)}</td><td>${f.ingNetos.mesBudg.toFixed(1)}</td><td>${f.ingNetos.ytdBudg.toFixed(1)}</td>
+        <td class="${vc(f.ingNetos.varEur)}">${f.ingNetos.varEur>=0?'+':''}${f.ingNetos.varEur.toFixed(1)}</td><td>${vp(f.ingNetos.varPct)}</td></tr>
+    </tbody></table></div>
+    ${f.nota?`<div class="nota">&#9888;&nbsp;${f.nota}</div>`:''}
+  </div>`;
+  document.getElementById('budgetContent').innerHTML=html;
+  if(FUNDS[id].monthly){
+    const fd=FUNDS[id].monthly;
+    const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    document.getElementById('budgetContent').innerHTML+=`
+    <div class="sec-title" style="margin-top:8px">Evolución mensual 2026 — Real vs Budget</div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">AUM mensual (€M)</div><div style="position:relative;height:220px"><canvas id="budgetAumChart"></canvas></div></div>
+      <div class="card"><div class="card-title">Ingresos mensuales (€k)</div><div style="position:relative;height:220px"><canvas id="budgetIngChart"></canvas></div></div>
+    </div>`;
+    setTimeout(()=>{
+      const ac=document.getElementById('budgetAumChart');
+      if(ac){dc('bdgAum');charts.bdgAum=new Chart(ac,{type:'bar',data:{labels:meses,datasets:[{label:'Budget',data:fd.aum.budget,type:'line',borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#185FA5'},{label:'Real',data:fd.aum.real,backgroundColor:'#185FA5',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?'€'+v+'Mn':'',font:{size:10}}}}}});}
+      const ic=document.getElementById('budgetIngChart');
+      if(ic){dc('bdgIng');charts.bdgIng=new Chart(ic,{type:'bar',data:{labels:meses,datasets:[{label:'Budget',data:fd.ingresos.budget,type:'line',borderColor:'#3B6D11',backgroundColor:'rgba(59,109,17,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#3B6D11'},{label:'Real',data:fd.ingresos.real,backgroundColor:'#3B6D11',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?v+'k':'',font:{size:10}}}}}});}
+    },150);
+  }
+}
+
+// ── FUND DETAIL ───────────────────────────────────────────────────
+function renderFund(id){
+  allDc();
+  const f=FUNDS[id];const c=f.color||dc_(f.tipo);const bg=f.color?f.color+'22':dbg(f.tipo);const tc=dtc(f.tipo);
+
+  let html=`
+  <div class="fund-header">
+    <div class="fund-avatar" style="background:${c}">${f.name[0]}</div>
+    <div>
+      <div class="fund-header-name">${f.name}</div>
+      <div class="fund-header-meta">
+        <span class="badge" style="background:${bg};color:${tc}">${f.tipoLabel}</span>
+        &nbsp;·&nbsp; ${f.manager} &nbsp;·&nbsp; ${f.inicio} → ${f.fin}
+        &nbsp;·&nbsp; <span style="background:var(--blue-lt);color:var(--blue);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">&#128197; KPIs a 30/04/2026</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray-600);margin-top:6px;max-width:600px">${f.estrategia}</div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">AUM real (abr)</div><div class="kpi-value">${f.aum.acReal!=null?fM(f.aum.acReal):fM(f.aum.real)}</div><div class="kpi-sub ${vc(f.aum.varPct)}">vs ${f.aum.acBudg!=null?fM(f.aum.acBudg):fM(f.aum.budget)} budget</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ingresos ac. abril</div><div class="kpi-value">${fK(f.ingresos.acReal)}</div><div class="kpi-sub ${vc(f.ingresos.varPct)}">vs ${fK(f.ingresos.acBudg)} budget · ${f.ingresos.varPct>0?'+':''}${f.ingresos.varPct}%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Gastos ac. abril</div><div class="kpi-value">${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</div><div class="kpi-sub neu">${f.gastos.acBudg!=null&&f.gastos.acBudg!==0?'Budget '+fK(Math.abs(f.gastos.acBudg)):'Sin gastos asignados'}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Ing. netos ac. abril</div><div class="kpi-value">${fK(f.ingNetos.acReal)}</div><div class="kpi-sub ${vc(f.ingNetos.varPct)}">vs ${fK(f.ingNetos.acBudg)} budget · ${f.ingNetos.varPct>0?'+':''}${f.ingNetos.varPct}%</div></div>
+  </div>
+
+  <div class="sec-title">Real vs budget</div>
+  <div class="card" style="margin-bottom:20px"><div class="tbl-wrap"><table>
+    <thead><tr><th></th><th>Ac. abril real</th><th>Mayo est.</th><th>YTD est.</th><th>Ac. abr. budget</th><th>Mayo budget</th><th>YTD budget</th><th>Var. €</th><th>Var. %</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:600">AUM (€M)</td>
+      <td>${f.aum.acReal!=null?f.aum.acReal.toFixed(1):'—'}</td>
+      <td>${f.aum.mesReal!=null?f.aum.mesReal.toFixed(1):'—'}</td>
+      <td style="font-weight:700">${f.aum.real.toFixed(1)}</td>
+      <td style="color:var(--gray-400)">${f.aum.acBudg!=null?f.aum.acBudg.toFixed(1):'—'}</td>
+      <td style="color:var(--gray-400)">${f.aum.mesBudg!=null?f.aum.mesBudg.toFixed(1):'—'}</td>
+      <td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
+      <td class="${vc(f.aum.varEur)}">${f.aum.varEur>=0?'+':''}${f.aum.varEur.toFixed(1)}</td>
+      <td>${vp(f.aum.varPct)}</td></tr>
+      ${id==='alcantara'&&f.progFirmados?`<tr><td style="font-weight:600">Imp. prog. firmados (€M)</td>
+      <td>${f.progFirmados.acReal!=null?f.progFirmados.acReal.toFixed(1):'—'}</td>
+      <td>${f.progFirmados.mesReal!=null?f.progFirmados.mesReal.toFixed(1):'—'}</td>
+      <td style="font-weight:700">${f.progFirmados.real.toFixed(1)}</td>
+      <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):'—'}</td>
+      <td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):'—'}</td>
+      <td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
+      <td class="${vc(f.progFirmados.varEur)}">${f.progFirmados.varEur>=0?'+':''}${f.progFirmados.varEur.toFixed(1)}</td>
+      <td>${vp(f.progFirmados.varPct)}</td></tr>`:''}
+      <tr><td style="font-weight:600">Ingresos (€k)</td><td>${f.ingresos.acReal!=null?fK(f.ingresos.acReal):'—'}</td><td>${f.ingresos.mesReal!=null?fK(f.ingresos.mesReal):'—'}</td><td style="font-weight:700">${f.ingresos.ytdReal.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.acBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.mesBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.ytdBudg.toFixed(1)}</td><td class="${vc(f.ingresos.varEur)}">${f.ingresos.varEur>=0?'+':''}${f.ingresos.varEur.toFixed(1)}</td><td>${vp(f.ingresos.varPct)}</td></tr>
+      ${f.gastos.ytdReal>0||f.gastos.ytdBudg>0?`<tr><td style="font-weight:600">Gastos (€k)</td><td>${f.gastos.acReal>0?'('+f.gastos.acReal.toFixed(1)+')':'—'}</td><td>${f.gastos.mesReal>0?'('+f.gastos.mesReal.toFixed(1)+')':'—'}</td><td style="font-weight:700">${f.gastos.ytdReal>0?'('+f.gastos.ytdReal.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.acBudg>0?'('+f.gastos.acBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.mesBudg>0?'('+f.gastos.mesBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.ytdBudg>0?'('+f.gastos.ytdBudg.toFixed(1)+')':'—'}</td><td></td><td></td></tr>`:''}
+      <tr class="total-row"><td>Ingresos netos (€k)</td><td>${f.ingNetos.acReal.toFixed(1)}</td><td>${f.ingNetos.mesReal.toFixed(1)}</td><td>${f.ingNetos.ytdReal.toFixed(1)}</td><td>${f.ingNetos.acBudg.toFixed(1)}</td><td>${f.ingNetos.mesBudg.toFixed(1)}</td><td>${f.ingNetos.ytdBudg.toFixed(1)}</td><td class="${vc(f.ingNetos.varEur)}">${f.ingNetos.varEur>=0?'+':''}${f.ingNetos.varEur.toFixed(1)}</td><td>${vp(f.ingNetos.varPct)}</td></tr>
+    </tbody>
+  </table></div>${f.nota?`<div class="nota">&#9888;&nbsp;${f.nota}</div>`:''}</div>`;
+
+  if(id==='triana'){
+    html += renderTrianaPortfolio();
+  } else if(id==='alcantara'){
+    const purple='#534AB7';
+    const sColors=['#534AB7','#185FA5','#3B6D11','#16A085','#8E44AD','#475569','#D85A30','#2980B9','#C0392B','#7F8C8D','#BDC3C7'];
+    const rColors={Baa2:'#2980B9',Baa3:'#2980B9',Ba1:'#534AB7',Ba2:'#534AB7',Ba3:'#16A085',B1:'#D85A30',B2:'#C0392B',B3:'#C0392B'};
+    html+=`
+    <div class="sec-title">Cartera — 30/04/2026</div>
+    <div class="kpi-grid" style="margin-bottom:20px">
+      <div class="kpi-card"><div class="kpi-label">Outstanding Balance</div><div class="kpi-value" style="color:#534AB7">€82.0Mn</div><div class="kpi-sub neu">254 pagarés · 55 emisores</div></div>
+      <div class="kpi-card"><div class="kpi-label">Performing</div><div class="kpi-value" style="color:var(--success)">€75.3Mn</div><div class="kpi-sub neu">91.8% del portfolio</div></div>
+      <div class="kpi-card"><div class="kpi-label">En default</div><div class="kpi-value dn">€6.7Mn</div><div class="kpi-sub dn">8.2% · 10 pagarés</div></div>
+      <div class="kpi-card"><div class="kpi-label">All-in rate medio pond.</div><div class="kpi-value">6.958%</div><div class="kpi-sub neu">vs mínimo 11%</div></div>
+      <div class="kpi-card"><div class="kpi-label">Tenor medio pond.</div><div class="kpi-value">2.22 meses</div><div class="kpi-sub neu">vs máximo 4 meses</div></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card"><div class="card-title">Distribución sectorial (% OB)</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">${ALC_SECTORS.map((s,i)=>`<span style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--gray-400)"><span style="width:8px;height:8px;border-radius:50%;background:${sColors[i%sColors.length]};display:inline-block"></span>${s.sector}</span>`).join('')}</div>
+        <div style="position:relative;height:210px"><canvas id="alcSectorChart"></canvas></div>
+      </div>
+      <div class="card"><div class="card-title">Distribución por rating (OB €Mn)</div>
+        <div style="position:relative;height:210px"><canvas id="alcRatingChart"></canvas></div>
+      </div>
+    </div>
+    <div class="sec-title">Top 10 emisores por saldo vivo</div>
+    <div class="card" style="margin-bottom:20px"><div style="position:relative;height:300px"><canvas id="alcTop10Chart"></canvas></div></div>
+    <div class="sec-title">Detalle top 10 emisores</div>
+    <div class="card" style="margin-bottom:20px"><div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Emisor</th><th style="text-align:right">OB (€Mn)</th><th style="text-align:right">% portfolio</th><th style="text-align:right">Nº pagarés</th></tr></thead>
+      <tbody>${ALC_TOP10.map((d,i)=>`<tr>
+        <td style="color:var(--gray-400);font-size:12px">${i+1}</td>
+        <td style="font-weight:600;font-size:13px">${d.name}</td>
+        <td style="text-align:right;font-weight:600;color:#534AB7">€${d.ob.toFixed(1)}Mn</td>
+        <td style="text-align:right"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:80px;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.min(d.pct/10*100,100).toFixed(0)}%;background:#534AB7;border-radius:3px"></div></div>${d.pct.toFixed(1)}%</div></td>
+        <td style="text-align:right;color:var(--gray-400)">${d.notes}</td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>`;
+    setTimeout(()=>{
+      const sc=document.getElementById('alcSectorChart');
+      if(sc){dc('alcSec');charts.alcSec=new Chart(sc,{type:'doughnut',data:{labels:ALC_SECTORS.map(s=>s.sector),datasets:[{data:ALC_SECTORS.map(s=>s.ob),backgroundColor:sColors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: €${c.parsed.toFixed(1)}Mn (${ALC_SECTORS[c.dataIndex].pct}%)`}}}}});}
+      const rc=document.getElementById('alcRatingChart');
+      if(rc){dc('alcRat');charts.alcRat=new Chart(rc,{type:'bar',data:{labels:ALC_RATINGS.map(r=>r[0]),datasets:[{data:ALC_RATINGS.map(r=>r[1]),backgroundColor:ALC_RATINGS.map(r=>rColors[r[0]]||'#BDC3C7'),borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` €${c.parsed.y.toFixed(1)}Mn`}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}}}}}});}
+      const tc=document.getElementById('alcTop10Chart');
+      if(tc){dc('alcTop');charts.alcTop=new Chart(tc,{type:'bar',data:{labels:ALC_TOP10.map(d=>d.name),datasets:[{data:ALC_TOP10.map(d=>d.ob),backgroundColor:'#534AB7',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` €${c.parsed.x.toFixed(1)}Mn (${ALC_TOP10[c.dataIndex].pct}%)`}}},sections:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});}
+    },150);
+  } else if(id==='ronda'){
+    html += renderRondaPortfolio();
+  } else if(id==='alameda'){
+    html += renderAlamedaPortfolio();
+  } else {
+    html+=`<div class="card" style="text-align:center;padding:40px;color:var(--gray-400)">
+      <div style="font-size:32px;margin-bottom:10px">&#128336;</div>
+      <div style="font-size:15px;font-weight:600">Fondo en fase de arranque</div>
+      <div style="font-size:13px;margin-top:6px">Sin actividad en el período</div>
+    </div>`;
+  }
+  document.getElementById('fundContent').innerHTML=html;
+}
+
+// ── TRIANA PORTFOLIO VIEW ─────────────────────────────────────────
+function ratingColor(r){
+  if(!r||r==='N/A') return 'var(--gray-400)';
+  if(r.startsWith('BB')) return 'var(--success)';
+  if(r.startsWith('B+')) return '#2980B9';
+  if(r==='B'||r==='B-') return 'var(--warning)';
+  if(r==='D'||r.startsWith('CCC')) return 'var(--danger)';
+  return 'var(--gray-600)';
+}
+function ratingBg(r){
+  if(!r||r==='N/A') return 'var(--gray-100)';
+  if(r.startsWith('BB')) return 'var(--success-lt)';
+  if(r.startsWith('B+')) return 'var(--info-lt)';
+  if(r==='B'||r==='B-') return 'var(--warning-lt)';
+  if(r==='D'||r.startsWith('CCC')) return 'var(--danger-lt)';
+  return 'var(--gray-50)';
+}
+function fmtEur(v){
+  if(!v) return '—';
+  if(v>=1000000) return '€'+( v/1000000).toFixed(2)+'Mn';
+  return '€'+(v/1000).toFixed(0)+'k';
+}
+
+function renderTrianaPortfolio(){
+  const total = window.TRIANA_TOTAL_LIVE || TRIANA_TOTAL;
+  const top10 = TRIANA_TOP10;
+  const loans = TRIANA_LOANS;
+  const sectors = TRIANA_SECTORS;
+  const sectorColors = ['#185FA5','#534AB7','#3B6D11','#D85A30','#E67E22','#2980B9','#8E44AD','#16A085','#C0392B','#7F8C8D'];
+
+  // Capital structure
+  const capStructHtml = `
+  <div class="sec-title">Estructura de capital — post-IPD Q1 2026 (feb 2026)</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div class="kpi-card" style="border-left:4px solid #3B6D11"><div class="kpi-label">Equity</div><div class="kpi-value" style="color:#3B6D11">25.4%</div><div class="kpi-sub neu">Tribeka/Verde · €32.2M</div></div>
+    <div class="kpi-card" style="border-left:4px solid #185FA5"><div class="kpi-label">Senior — Duomo</div><div class="kpi-value" style="color:#185FA5">31.9%</div><div class="kpi-sub neu">Duomo Funding · €40.4M</div></div>
+    <div class="kpi-card" style="border-left:4px solid #2980B9"><div class="kpi-label">Senior — Citi</div><div class="kpi-value" style="color:#2980B9">19.1%</div><div class="kpi-sub neu">Citibank N.A. · €24.1M</div></div>
+    <div class="kpi-card" style="border-left:4px solid #534AB7"><div class="kpi-label">Subordinada</div><div class="kpi-value" style="color:#534AB7">23.6%</div><div class="kpi-sub neu">Beka RAIF · €29.9M</div></div>
+  </div>
+  <div style="background:var(--gray-50);border-radius:var(--radius);padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--gray-600)">
+    <strong>Total:</strong> €126.5M &nbsp;·&nbsp; <strong>All-in:</strong> 3.918% &nbsp;·&nbsp; <strong>Facility agent:</strong> Apex Group &nbsp;·&nbsp; <strong>Security agent:</strong> Citibank N.A.
+  </div>`;
+
+  // Portfolio KPIs
+  const portfolioKpisHtml = `
+  <div class="sec-title">Cartera</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Exposición viva (performing)</div><div class="kpi-value">€${(total/1e6).toFixed(1)}Mn</div><div class="kpi-sub neu">${loans.length} deudores</div></div>
+    <div class="kpi-card"><div class="kpi-label">Mayor exposición</div><div class="kpi-value">${fmtEur(top10[0]?.curr)}</div><div class="kpi-sub neu">${top10[0]?.issuer||''}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Spread medio ponderado</div><div class="kpi-value">8.88%</div><div class="kpi-sub neu">vs límite 6.50%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Vida media ponderada</div><div class="kpi-value">1.24 años</div><div class="kpi-sub neu">vs límite 3.5 años</div></div>
+    <div class="kpi-card"><div class="kpi-label">Posiciones en default</div><div class="kpi-value">14</div><div class="kpi-sub dn">Default ratio 43.5%</div></div>
+  </div>`;
+
+  // Charts row: sector pie + top10 bar
+  const chartsHtml = `
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">Diversificación sectorial (exposición viva)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        ${sectors.map((s,i)=>`<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-400)"><span style="width:9px;height:9px;border-radius:50%;background:${sectorColors[i%sectorColors.length]};display:inline-block"></span>${s.s}</span>`).join('')}
+      </div>
+      <div style="position:relative;height:220px"><canvas id="trianaSecChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 10 exposición (€M nominal actual)</div>
+      <div style="position:relative;height:${top10.length*28+50}px"><canvas id="trianaTop10Chart"></canvas></div>
+    </div>
+  </div>`;
+
+  // Loans table
+  const tableHtml = `
+  <div class="sec-title">Deudores vivos — detalle posición a posición</div>
+  <div class="card">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <input id="trianaFilter" type="text" placeholder="🔍 Buscar deudor o sector..." oninput="filterTrianaTable()"
+        style="flex:1;min-width:180px;padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none">
+      <select id="trianaSectorFilter" onchange="filterTrianaTable()"
+        style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:#fff;outline:none">
+        <option value="">Todos los sectores</option>
+        ${[...new Set(loans.map(l=>l.sector))].sort().map(s=>`<option value="${s}">${s}</option>`).join('')}
+      </select>
+      <select id="trianaSort" onchange="filterTrianaTable()"
+        style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:#fff;outline:none">
+        <option value="curr_desc">Mayor nominal actual ↓</option>
+        <option value="curr_asc">Menor nominal actual ↑</option>
+        <option value="orig_desc">Mayor nominal original ↓</option>
+        <option value="issuer_asc">Nombre A-Z</option>
+        <option value="maturity_asc">Próximo vencimiento</option>
+      </select>
+      <span id="trianaCount" style="font-size:12px;color:var(--gray-400)"></span>
+    </div>
+    <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>Deudor</th><th>Sector</th><th>Región</th>
+      <th style="text-align:right">Nominal orig.</th><th style="text-align:right">Nominal actual</th>
+      <th>Rating Eth.</th><th>Rating actual</th>
+      <th>Vencimiento</th><th style="text-align:right">Próximo pago</th>
+    </tr></thead>
+    <tbody id="trianaTableBody">
+      ${[...loans].sort((a,b)=>b.curr-a.curr).map(l=>`<tr data-issuer="${l.issuer.toLowerCase()}" data-sector="${l.sector}" data-curr="${l.curr}" data-orig="${l.orig}" data-maturity="${l.maturity||''}">
+        <td style="font-weight:600;white-space:nowrap">${l.issuer}</td>
+        <td style="font-size:12px;color:var(--gray-400)">${l.sector}</td>
+        <td style="font-size:12px;color:var(--gray-400)">${l.region}</td>
+        <td style="text-align:right">${fmtEur(l.orig)}</td>
+        <td style="text-align:right;font-weight:600">${fmtEur(l.curr)}</td>
+        <td><span style="padding:2px 7px;border-radius:8px;font-size:11px;font-weight:600;background:${ratingBg(l.ratingEth)};color:${ratingColor(l.ratingEth)}">${l.ratingEth||'—'}</span></td>
+        <td><span style="padding:2px 7px;border-radius:8px;font-size:11px;font-weight:600;background:${ratingBg(l.ratingCurr)};color:${ratingColor(l.ratingCurr)}">${l.ratingCurr||'—'}</span></td>
+        <td style="font-size:12px">${l.maturity||'—'}</td>
+        <td style="text-align:right;font-size:12px">${fmtEur(l.nextPay)}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>
+  </div>`;
+
+  // Schedule charts after DOM renders
+  setTimeout(()=>{
+    const secCtx = document.getElementById('trianaSecChart');
+    const top10Ctx = document.getElementById('trianaTop10Chart');
+    if(secCtx){
+      dc('triSec');
+      charts.triSec = new Chart(secCtx,{type:'doughnut',
+        data:{labels:sectors.map(s=>s.s), datasets:[{data:sectors.map(s=>s.v), backgroundColor:sectorColors.slice(0,sectors.length), borderWidth:2, borderColor:'#fff'}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false}}}
+      });
+    }
+    if(top10Ctx){
+      dc('triTop');
+      charts.triTop = new Chart(top10Ctx,{type:'bar',
+        data:{labels:top10.map(l=>l.issuer), datasets:[{data:top10.map(l=>l.curr/1e6), backgroundColor:'#185FA5', borderWidth:0, borderRadius:3}]},
+        options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+          scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:11}}}, y:{grid:{display:false},ticks:{font:{size:11}}}}}
+      });
+    }
+  },150);
+
+
+
+
+
+  return capStructHtml + portfolioKpisHtml + chartsHtml + tableHtml;
+}
+
+
+
+// ── ALAMEDA PORTFOLIO VIEW ────────────────────────────────────────
+const ALAMEDA_LOANS = [
+  {
+    sponsor:    'RIC Energy',
+    borrower:   'Blue Energy Sun, S.L.',
+    project:    'Bluesol',
+    tech:       'Solar PV',
+    region:     'Castilla La Mancha',
+    capacity:   60.58,
+    orig:       29474480,
+    drawn:      5700000,
+    undrawn:    23774480,
+    committed:  29474480,
+    signing:    '30/09/2025',
+    maturity:   '30/09/2030',
+    firstDraw:  '07/11/2025',
+    cod:        '01/01/2027',
+    firstAmort: '31/12/2028',
+    spread:     0.07,
+    allin:      0.09124,
+    leverage:   0.6677,
+    status:     'Performing',
+    defaulted:  'No',
+    nextPay:    440777,
+  }
+];
+
+function renderAlamedaPortfolio(){
+  const loans = ALAMEDA_LOANS;
+  const total_drawn = loans.reduce((s,l)=>s+l.drawn, 0);
+  const total_committed = loans.reduce((s,l)=>s+l.committed, 0);
+  const total_undrawn = loans.reduce((s,l)=>s+l.undrawn, 0);
+  const green = '#3B6D11';
+  const sectorColors = ['#185FA5','#3B6D11','#534AB7','#D85A30','#E67E22'];
+
+  // ── KPIs ──
+  const kpisHtml = `
+  <div class="sec-title">Cartera</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-card">
+      <div class="kpi-label">Dispuesto (datatape)</div>
+      <div class="kpi-value" style="color:${green}">€${(total_drawn/1e6).toFixed(1)}Mn</div>
+      <div class="kpi-sub dn">vs €${FUNDS.alameda.aum.real}M AUM budget YTD</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Comprometido total</div>
+      <div class="kpi-value">€${(total_committed/1e6).toFixed(1)}Mn</div>
+      <div class="kpi-sub neu">${loans.length} operación${loans.length!==1?'es':''}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pendiente de disponer</div>
+      <div class="kpi-value">€${(total_undrawn/1e6).toFixed(1)}Mn</div>
+      <div class="kpi-sub neu">${((total_undrawn/total_committed)*100).toFixed(0)}% del comprometido</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">All-in rate medio pond.</div>
+      <div class="kpi-value">${(loans.reduce((s,l)=>s+l.allin*l.drawn,0)/total_drawn*100).toFixed(2)}%</div>
+      <div class="kpi-sub neu">6M Euribor + Spread</div>
+    </div>
+  </div>`;
+
+  // ── CHARTS: tecnología + top exposición ──
+  const techAgg = {};
+  loans.forEach(l=>{ techAgg[l.tech]=(techAgg[l.tech]||0)+l.drawn; });
+  const techLabels = Object.keys(techAgg);
+  const techVals   = Object.values(techAgg);
+
+  const sorted = [...loans].sort((a,b)=>b.drawn-a.drawn).slice(0,10);
+
+  const chartsHtml = `
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-title">Exposición por tecnología (dispuesto €M)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        ${techLabels.map((t,i)=>`<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-400)">
+          <span style="width:9px;height:9px;border-radius:50%;background:${sectorColors[i%sectorColors.length]};display:inline-block"></span>${t}
+        </span>`).join('')}
+      </div>
+      <div style="position:relative;height:200px"><canvas id="alamedaTechChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Top exposición por proyecto (€M dispuesto)</div>
+      <div style="position:relative;height:${sorted.length*40+60}px"><canvas id="alamedaTopChart"></canvas></div>
+    </div>
+  </div>`;
+
+  // ── TABLA DE POSICIONES ──
+  const tableHtml = `
+  <div class="sec-title">Posiciones vivas — detalle</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Proyecto</th><th>Sponsor</th><th>Tecnología</th><th>Región</th>
+        <th style="text-align:right">Capacidad (MW)</th>
+        <th style="text-align:right">Comprometido</th>
+        <th style="text-align:right">Dispuesto</th>
+        <th style="text-align:right">Pendiente</th>
+        <th style="text-align:right">Spread</th>
+        <th style="text-align:right">All-in</th>
+        <th style="text-align:right">Leverage</th>
+        <th>Vencimiento</th>
+        <th>Estado</th>
+        <th style="text-align:right">Próx. pago</th>
+      </tr></thead>
+      <tbody>
+        ${loans.map(l=>`<tr>
+          <td style="font-weight:600;white-space:nowrap">${l.project}</td>
+          <td style="font-size:12px;color:var(--gray-600)">${l.sponsor}</td>
+          <td style="font-size:12px;color:var(--gray-400)">${l.tech}</td>
+          <td style="font-size:12px;color:var(--gray-400)">${l.region}</td>
+          <td style="text-align:right">${l.capacity.toFixed(1)}</td>
+          <td style="text-align:right">€${(l.committed/1e6).toFixed(2)}Mn</td>
+          <td style="text-align:right;font-weight:600;color:var(--success)">€${(l.drawn/1e6).toFixed(2)}Mn</td>
+          <td style="text-align:right;color:var(--gray-400)">€${(l.undrawn/1e6).toFixed(2)}Mn</td>
+          <td style="text-align:right">${(l.spread*100).toFixed(2)}%</td>
+          <td style="text-align:right;font-weight:600">${(l.allin*100).toFixed(3)}%</td>
+          <td style="text-align:right">${(l.leverage*100).toFixed(1)}%</td>
+          <td style="font-size:12px">${l.maturity}</td>
+          <td><span style="padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600;
+            background:${l.status==='Performing'?'var(--success-lt)':'var(--danger-lt)'};
+            color:${l.status==='Performing'?'var(--success)':'var(--danger)'}">
+            ${l.status}</span></td>
+          <td style="text-align:right;font-size:12px">€${(l.nextPay/1000).toFixed(0)}k</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+
+  // ── FICHA DETALLE (fechas clave) ──
+  const fichaHtml = `
+  <div class="sec-title">Fechas clave por operación</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Proyecto</th><th>Firma</th><th>1er drawdown</th>
+        <th>COD esperado</th><th>1ª amortización</th><th>Vencimiento</th>
+        <th>Periodo disponibilidad</th>
+      </tr></thead>
+      <tbody>
+        ${loans.map(l=>`<tr>
+          <td style="font-weight:600">${l.project}</td>
+          <td style="font-size:12px">${l.signing}</td>
+          <td style="font-size:12px">${l.firstDraw}</td>
+          <td style="font-size:12px;font-weight:600;color:var(--blue)">${l.cod}</td>
+          <td style="font-size:12px">${l.firstAmort}</td>
+          <td style="font-size:12px;font-weight:600">${l.maturity}</td>
+          <td style="font-size:12px;color:var(--gray-400)">hasta 31/12/2026</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+
+  // ── COVENANTS ──
+  const covenantsHtml = `
+  <div class="sec-title">Covenants — abril 2026</div>
+  <div class="card" style="margin-bottom:20px">
+    <table>
+      <thead><tr><th>#</th><th>Covenant</th><th style="text-align:right">Actual</th><th style="text-align:right">Límite</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--gray-400);font-size:12px">1</td><td>Master Fund Tangible Net Worth</td><td style="text-align:right">€9.10M</td><td style="text-align:right">€5.70M</td><td><span style="background:var(--success-lt);color:var(--success);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Pass</span></td></tr>
+        <tr><td style="color:var(--gray-400);font-size:12px">2</td><td>Portfolio Cumulative Default Ratio</td><td style="text-align:right">0%</td><td style="text-align:right">12.5%</td><td><span style="background:var(--success-lt);color:var(--success);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Pass</span></td></tr>
+        <tr><td style="color:var(--gray-400);font-size:12px">3</td><td>Portfolio Cumulative Loss Ratio</td><td style="text-align:right">0%</td><td style="text-align:right">2.5%</td><td><span style="background:var(--success-lt);color:var(--success);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Pass</span></td></tr>
+        <tr><td style="color:var(--gray-400);font-size:12px">4</td><td>Default Ratio</td><td style="text-align:right">0%</td><td style="text-align:right">7.5%</td><td><span style="background:var(--success-lt);color:var(--success);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Pass</span></td></tr>
+        <tr><td style="color:var(--gray-400);font-size:12px">5</td><td>Interest Cover Ratio (ICR)</td><td style="text-align:right">0.84x</td><td style="text-align:right">1.15x</td><td><span style="background:var(--warning-lt);color:var(--warning);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Waived</span></td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;padding:10px 12px;background:var(--warning-lt);border-radius:6px;border-left:3px solid var(--warning);font-size:12px;color:var(--gray-600)">
+      ⚠ ICR waived para los períodos de reporte de marzo y abril hasta el próximo IPD. El proyecto está en fase pre-COD (aún no genera ingresos operativos).
+    </div>
+  </div>`;
+
+  // ── PIPELINE ──
+  const pipelineHtml = `
+  <div class="sec-title">Pipeline</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Operación</th><th style="text-align:right">Importe</th><th>Estado</th></tr></thead>
+      <tbody>
+        ${FUNDS.alameda.pipeline.map(p=>`<tr>
+          <td style="font-weight:600">${p.cliente}</td>
+          <td style="text-align:right">${p.importe}</td>
+          <td style="color:var(--gray-400);font-size:12px">${p.estado}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  // ── CHARTS ──
+  setTimeout(()=>{
+    const techCtx = document.getElementById('alamedaTechChart');
+    const topCtx  = document.getElementById('alamedaTopChart');
+    if(techCtx){
+      dc('alamTech');
+      charts.alamTech = new Chart(techCtx,{
+        type:'doughnut',
+        data:{labels:techLabels, datasets:[{data:techVals, backgroundColor:sectorColors, borderWidth:2, borderColor:'#fff'}]},
+        options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': €'+(c.raw/1e6).toFixed(2)+'Mn'}}}}
+      });
+    }
+    if(topCtx){
+      dc('alamTop');
+      charts.alamTop = new Chart(topCtx,{
+        type:'bar',
+        data:{labels:sorted.map(l=>l.project), datasets:[
+          {label:'Dispuesto',   data:sorted.map(l=>l.drawn/1e6),   backgroundColor:'#3B6D11', borderWidth:0, borderRadius:3},
+          {label:'Pendiente',   data:sorted.map(l=>l.undrawn/1e6), backgroundColor:'#D6E4F0', borderWidth:0, borderRadius:3},
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+          plugins:{legend:{display:true,position:'top'},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': €'+c.parsed.x.toFixed(2)+'Mn'}}},
+          scales:{x:{stacked:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v+'Mn',font:{size:11}}},y:{stacked:true,grid:{display:false},ticks:{font:{size:11}}}}}
+      });
+    }
+  },150);
+
+  return kpisHtml + chartsHtml + tableHtml + fichaHtml + covenantsHtml + pipelineHtml;
+}
+
+
+
+// ── RONDA PORTFOLIO DATA (real, 30/04/2026) ───────────────────────
+const RONDA_TOP10 = [{"name": "Novartis Farmaceutica S.A.", "balance": 18177544, "pct": 36.8}, {"name": "Curium Pharma Spain, S.A.", "balance": 14894878, "pct": 30.1}, {"name": "Altan Pharmaceuticals, S.A.U.", "balance": 4008224, "pct": 8.1}, {"name": "Philips Iberica, S.A.U.", "balance": 3748530, "pct": 7.6}, {"name": "Spineart España, S.L.U.", "balance": 2397630, "pct": 4.8}, {"name": "Leleman, S.L.", "balance": 1404379, "pct": 2.8}, {"name": "Ofilingua, S.L.", "balance": 1362926, "pct": 2.8}, {"name": "Textil Planas Oliveras, S.A.", "balance": 947561, "pct": 1.9}, {"name": "Biocablan, S.L.", "balance": 864305, "pct": 1.7}, {"name": "Vortrom Biologics S.L.", "balance": 531962, "pct": 1.1}];
+
+// ── RONDA PORTFOLIO VIEW ──────────────────────────────────────────
+function renderRondaPortfolio(){
+  const performing  = 49.45;
+  const defaulted   = 0.132;
+  const purchases   = 20.95;
+  const collections = 13.05;
+  const outstanding = 49.89;
+  const nFacturas   = 15709;
+  const nCedentes   = 34;
+  const green = '#3B6D11';
+
+  const kpisHtml = `
+  <div class="sec-title">Cartera</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Portfolio performing</div><div class="kpi-value" style="color:${green}">€${performing.toFixed(1)}Mn</div><div class="kpi-sub neu">${nFacturas.toLocaleString()} facturas · ${nCedentes} cedentes</div></div>
+    <div class="kpi-card"><div class="kpi-label">Portfolio defaulted</div><div class="kpi-value">${(defaulted*1000).toFixed(0)}k</div><div class="kpi-sub dn">${(defaulted/performing*100).toFixed(2)}% del portfolio</div></div>
+    <div class="kpi-card"><div class="kpi-label">Compras en el periodo</div><div class="kpi-value">€${purchases.toFixed(1)}Mn</div><div class="kpi-sub neu">Abr 2026</div></div>
+    <div class="kpi-card"><div class="kpi-label">Cobros en el periodo</div><div class="kpi-value">€${collections.toFixed(1)}Mn</div><div class="kpi-sub neu">Abr 2026</div></div>
+  </div>`;
+
+  // Top 10 cedentes chart
+  const chartHtml = `
+  <div class="sec-title">Top 10 cedentes por saldo vivo (€M)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div style="position:relative;height:300px"><canvas id="rondaTop10Chart"></canvas></div>
+  </div>`;
+
+  // Top 10 table
+  const total = RONDA_TOP10.reduce((s,d)=>s+d.balance,0);
+  const tableHtml = `
+  <div class="sec-title">Detalle top 10 cedentes</div>
+  <div class="card" style="margin-bottom:20px"><div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Cedente</th><th style="text-align:right">Saldo vivo (€M)</th><th style="text-align:right">% portfolio</th><th style="text-align:right">Concentración</th></tr></thead>
+    <tbody>${RONDA_TOP10.map((d,i)=>`<tr>
+      <td style="color:var(--gray-400);font-size:12px">${i+1}</td>
+      <td style="font-weight:600">${d.name}</td>
+      <td style="text-align:right;font-weight:600;color:${green}">€${(d.balance/1e6).toFixed(2)}Mn</td>
+      <td style="text-align:right">${d.pct.toFixed(1)}%</td>
+      <td style="text-align:right">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+          <div style="width:80px;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${Math.min(d.pct/40*100,100).toFixed(0)}%;background:${green};border-radius:3px"></div>
+          </div>
+        </div>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div></div>`;
+
+  // Top debtors from stratification
+  const debtorHtml = `
+  <div class="sec-title">Top deudores (por saldo vivo)</div>
+  <div class="card" style="margin-bottom:20px"><div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Deudor</th><th style="text-align:right">Saldo vivo (€M)</th><th style="text-align:right">% portfolio</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--gray-400);font-size:12px">1</td><td style="font-weight:600">GVA (Generalitat Valenciana)</td><td style="text-align:right;font-weight:600;color:${green}">€22.54M</td><td style="text-align:right">45.5%</td></tr>
+      <tr><td style="color:var(--gray-400);font-size:12px">2</td><td style="font-weight:600">Quirón</td><td style="text-align:right">€3.94M</td><td style="text-align:right">7.9%</td></tr>
+      <tr><td style="color:var(--gray-400);font-size:12px">3</td><td style="font-weight:600">SAS (Servicio Andaluz de Salud)</td><td style="text-align:right">€2.69M</td><td style="text-align:right">5.4%</td></tr>
+    </tbody>
+  </table></div></div>`;
+
+  // Covenants
+  const covenantsHtml = `
+  <div class="sec-title">Covenants — abril 2026</div>
+  <div class="card" style="margin-bottom:20px"><table>
+    <thead><tr><th>Test</th><th>Descripción</th><th style="text-align:right">Actual</th><th style="text-align:right">Límite</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--gray-400);font-size:12px">1</td><td>Max. 25% arrears en portfolio elegible</td><td style="text-align:right">30.1%</td><td style="text-align:right">25%</td><td><span style="background:var(--warning-lt);color:var(--warning);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Waived</span></td></tr>
+      <tr><td style="color:var(--gray-400);font-size:12px">2</td><td>Min. discount Vortrom Biologics</td><td style="text-align:right">Por debajo</td><td style="text-align:right">Min. discount</td><td><span style="background:var(--warning-lt);color:var(--warning);padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600">Waived</span></td></tr>
+    </tbody>
+  </table></div>`;
+
+  // Pipeline
+  const pipelineHtml = ``
+  return kpisHtml + chartHtml + tableHtml + debtorHtml + covenantsHtml + pipelineHtml;
+}
+
+
+
+const DOCS_TREE = {
+  reportes: {
+    label:'Reportes', icon:'📊',
+    subs: {
+      budget: { label:'Budget 2026',
+        subs: {
+          zcc: { label:'Beka Credit & Beka Credit Group',
+            latest:{name:'Budget BC 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041203_Budget%20BC%202026%20-%20Consejo.pdf'},
+            historico:[]},
+          zco: { label:'Beka Credit Origination Advisory',
+            latest:{name:'Budget BCO 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041225_Budget%20BCO%202026%20-%20Consejo.pdf'},
+            historico:[]},
+          zch: { label:'Beka Healthcare',
+            latest:{name:'Budget BH 2026 - Consejo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Budget/041225_Budget%20BH%202026%20-%20Consejo.pdf'},
+            historico:[]},
+        }},
+      cierres:     { label:'Cierres Mensuales',
+        latest:{name:'ZintraCCG-Management Accounts 30-04-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2030-04-26.pdf'},
+        historico:[
+          {name:'Accounts 31-03-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-03-26.pdf'},
+          {name:'Accounts 28-02-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2028-02-26.pdf'},
+          {name:'Accounts 31-01-26', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-01-26.pdf'},
+          {name:'Accounts 31-12-25', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Cierres%20Mensuales/ZintraCCG-Management%20Accounts%2031-12-25.pdf'},
+        ]},
+      monday:      { label:'Monday Update',
+        latest:{name:'2026_S19_Control Presupuesto Mayo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S19_Control Presupuesto Mayo.pdf'},
+        historico:[
+          {name:'S18_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S18_Control Presupuesto Abril.pdf'},
+          {name:'S17_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S17_Control Presupuesto Abril.pdf'},
+          {name:'S16_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S16_Control Presupuesto Abril.pdf'},
+          {name:'S15_Control Presupuesto Abril', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S15_Control Presupuesto Abril.pdf'},
+          {name:'S13_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S13_Control Presupuesto Marzo.pdf'},
+          {name:'S12_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S12_Control Presupuesto Marzo.pdf'},
+          {name:'S11_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S11_Control Presupuesto Marzo.pdf'},
+          {name:'S10_Control Presupuesto Marzo', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S10_Control Presupuesto Marzo.pdf'},
+          {name:'S9_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S9_Control Presupuesto Febrero.pdf'},
+          {name:'S8_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S8_Control Presupuesto Febrero.pdf'},
+          {name:'S7_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S7_Control Presupuesto Febrero.pdf'},
+          {name:'S6_Control Presupuesto Febrero', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Monday%20Update/2026_S6_Control Presupuesto Febrero.pdf'},
+        ]},
+      coinversion: { label:'Reporte Coinversión',
+        latest:{name:"Financiación e inversiones - 04'26", url:"https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Reportes/Coinversión/Financiación e inversiones - 04'26.pdf"},
+        historico:[]},
+    }
+  },
+  fondos: {
+    label:'Fondos', icon:'🏦',
+    subs: {
+      triana: { label:'Triana', color:'#185FA5',
+        subs: {
+          legal: { label:'Documentación Legal', docs:[
+            {name:'Master Framework Agreement (MFA)', desc:'Contrato con inversores', url:''},
+            {name:'EGF Guarantee Agreement', desc:'Garantía FEI en vigor', url:''},
+            {name:'Loan Admin. Agreement', desc:'', url:''},
+            {name:'Triana Investment Advisory Agreement', desc:'', url:''},
+            {name:'RAIF Investment Advisory Agreement', desc:'', url:''},
+          ]},
+          ccaa: { label:'Cuentas Anuales', entities:[
+            {name:'Triana SME Lending',
+              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2025.pdf'},
+              historico:[
+                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2024.pdf'},
+                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2023.pdf'},
+                {name:'CCAA 2022', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Triana%20SME%20Lending/Triana SME Lending, S.á.r.l. - CCAA 2022.pdf'},
+              ]},
+            {name:'SICAV RAIF',
+              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2025.pdf'},
+              historico:[
+                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2024.pdf'},
+                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2023.pdf'},
+                {name:'CCAA 2022', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20SCA%20SICAV%20RAIF/Beka Investments SCA SICAV RAIF - CCAA 2022.pdf'},
+              ]},
+            {name:'Beka Investments GP',
+              latest:{name:'CCAA 2025', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2025.pdf'},
+              historico:[
+                {name:'CCAA 2024', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2024.pdf'},
+                {name:'CCAA 2023', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Fondos/Triana/Cuentas%20Anuales/Beka%20Investments%20GP/Beka Investments GP, S.à r.l. - CCAA 2023.pdf'},
+              ]},
+          ]},
+          manuales: { label:'Manuales', docs:[
+            {name:'Manual de Crédito', desc:'', url:''},
+            {name:'Manual de Recuperaciones', desc:'', url:''},
+          ]},
+          reporting: { label:'Reporting Inversores', docs:[
+            {name:'Weekly datatape', desc:'', url:''},
+            {name:'Monthly datatape', desc:'', url:''},
+            {name:'Quarterly FEI', desc:'', url:''},
+            {name:'IPD', desc:'', url:''},
+          ]},
+        }
+      },
+      alcantara: { label:'Alcántara', color:'#534AB7',
+        subs:{
+          legal:{label:'Documentación Legal', docs:[
+            {name:'Organigrama', desc:'', url:''},
+            {name:'Resumen del fondo', desc:'', url:''},
+            {name:'Documentación legal fondo', desc:'', url:''},
+            {name:'Manuales (crédito + recuperaciones)', desc:'', url:''},
+          ]},
+          portfolio:{label:'Portfolio y Performance', docs:[
+            {name:'Portfolio', desc:'', url:''},
+            {name:'Evolución histórica', desc:'', url:''},
+            {name:'Rentabilidad / Performance', desc:'', url:''},
+          ]},
+        }
+      },
+      vera: { label:'Vera', color:'#534AB7',
+        subs:{
+          legal:{label:'Documentación Legal', docs:[
+            {name:'Organigrama', desc:'', url:''},
+            {name:'Resumen del fondo', desc:'En proceso de cierre', url:''},
+            {name:'Documentación legal fondo', desc:'', url:''},
+          ]},
+        }
+      },
+      ronda: { label:'Ronda', color:'#3B6D11',
+        subs:{
+          legal:{label:'Documentación Legal', docs:[
+            {name:'Organigrama', desc:'', url:''},
+            {name:'Resumen del fondo', desc:'', url:''},
+            {name:'Documentación legal fondo', desc:'', url:''},
+            {name:'Manual', desc:'', url:''},
+          ]},
+        }
+      },
+      alameda: { label:'Alameda', color:'#185FA5',
+        subs:{
+          legal:{label:'Documentación Legal', docs:[
+            {name:'Organigrama', desc:'', url:''},
+            {name:'Resumen del fondo', desc:'', url:''},
+            {name:'Documentación legal fondo', desc:'', url:''},
+            {name:'Manual', desc:'', url:''},
+          ]},
+          reporting:{label:'Reporting', docs:[
+            {name:'Reportes inversores', desc:'', url:''},
+          ]},
+        }
+      },
+      belmonte: { label:'Belmonte', color:'#185FA5',
+        subs:{
+          legal:{label:'Documentación Legal', docs:[
+            {name:'Organigrama', desc:'', url:''},
+            {name:'Resumen del fondo', desc:'', url:''},
+            {name:'Documentación legal fondo', desc:'', url:''},
+            {name:'Manual', desc:'', url:''},
+          ]},
+        }
+      },
+    }
+  },
+  legal: {
+    label:'Legal', icon:'⚖️',
+    subs:{
+      ccaa_zcc:{ label:'CCAA ZCC (Beka Credit)',
+        latest:{name:'2025 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2025 CCAA Beka Credit-Auditadas.pdf'},
+        historico:[
+          {name:'2024 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2024 CCAA Beka Credit-Auditadas.pdf'},
+          {name:'2023 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2023 CCAA Beka Credit-Auditadas.pdf'},
+          {name:'2022 CCAA Beka Credit - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2022 CCAA Beka Credit-Auditadas.pdf'},
+          {name:'2021 CCAA Beka Credit (Sin Firmas)', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCC/2021 CCAA Beka Credit (Sin Firmas).pdf'},
+        ]},
+      ccaa_zco:{ label:'CCAA ZCO (Beka Credit Origination)',
+        latest:{name:'2025 CCAA Beka Credit Origination - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2025 CCAA Beka Credit Origination-Auditadas.pdf'},
+        historico:[
+          {name:'2024 CCAA Beka Credit Origination - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2024 CCAA Beka Credit Origination-Auditadas.pdf'},
+          {name:'2023 CCAA Beka Credit Origination', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2023 CCAA Beka Credit Origination.pdf'},
+          {name:'2022 CCAA Beka Credit Origination', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCO/2022 CCAA Beka Credit Origination.pdf'},
+        ]},
+      ccaa_zch:{ label:'CCAA ZCH (Beka Healthcare)',
+        latest:{name:'2025 CCAA Beka Healthcare - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCH/2025 CCAA Beka Healthcare-Auditadas.pdf'},
+        historico:[
+          {name:'2024 CCAA Beka Healthcare - Auditadas', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Legal/CCAA/ZCH/2024 CCAA Beka Healthcare-Auditadas.pdf'},
+        ]},
+      mercantil:{ label:'Datos mercantiles', docs:[
+        {name:'Datos mercantiles ZCC', desc:'', url:''},
+        {name:'Datos mercantiles ZCO', desc:'', url:''},
+        {name:'Datos mercantiles ZCH', desc:'', url:''},
+      ]},
+      poderes:{ label:'Poderes y contratos', docs:[
+        {name:'Poderes notariales', desc:'', url:''},
+        {name:'Contratos', desc:'', url:''},
+      ]},
+    }
+  },
+  contabilidad: {
+    label:'Contabilidad', icon:'📒',
+    subs:{
+      liquidez:{ label:'Proyección Liquidez',
+        latest:{name:'260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH)', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Contabilidad/Proyecci%C3%B3n%20Liquidez/260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH).pdf'},
+        historico:[
+          {name:'260316 13WCF ZINTRA Agregado', url:'https://grupocimd.sharepoint.com/sites/ZCRepositorioComun/Documentos%20compartidos/ZC%20Repositorio/Portada/Documentos%20Publicados/Contabilidad/Proyecci%C3%B3n%20Liquidez/260316 13WCF ZINTRA Agregado (ZCC-ZCO-ZCH).pdf'},
+        ]},
+      cierres:{ label:'Cierres contables', docs:[
+        {name:'Cierres contables ZCC', desc:'', url:''},
+        {name:'Cierres contables ZCO', desc:'', url:''},
+        {name:'Cierres contables ZCH', desc:'', url:''},
+      ]},
+      tesoreria:{ label:'Tesorería', docs:[
+        {name:'Tesorería consolidada', desc:'', url:''},
+      ]},
+      prestamos:{ label:'Préstamos', docs:[
+        {name:'Préstamos intragrupo', desc:'', url:''},
+      ]},
+    }
+  },
+  recuperaciones: {
+    label:'Recuperaciones', icon:'🔄',
+    subs:{
+      comite:{ label:'Agenda Comité de Recuperaciones',
+        latest:{name:'2026.04.22 - Agenda Comité de Recuperaciones', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.04.22 - Agenda Comité de Recuperaciones.pdf'},
+        historico:[
+          {name:'2026.04.09', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.04.09 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.03.26', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.03.26 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.03.12', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.03.12 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.02.26', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.02.26 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.02.12', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.02.12 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.01.29', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.01.29 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2026.01.15', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2026.01.15 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2025.12.18', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.12.18 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2025.12.04', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.12.04 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2025.11.20', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.11.20 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2025.11.06', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.11.06 - Agenda Comité de Recuperaciones.pdf'},
+          {name:'2025.10.22', url:'https://grupocimd.sharepoint.com/sites/18_BekaCredit/Documentos%20compartidos/Credit/6.%20Defaults/Comit%C3%A9s/2025.10.22 - Agenda Comité de Recuperaciones.pdf'},
+        ]},
+    }
+  },
+  politicas: {
+    label:'Políticas y Procesos', icon:'📋',
+    subs:{
+      gastos:{label:'Política de gastos', docs:[{name:'Política de gastos', desc:'', url:''}]},
+      pbcft: {label:'Manual PBCFT',       docs:[{name:'Manual PBCFT', desc:'', url:''}]},
+    }
+  },
+  rrhh: {
+    label:'RRHH', icon:'👥',
+    subs:{
+      estructura:{label:'Estructura departamentos', docs:[{name:'Estructura departamentos', desc:'', url:''}]},
+      governance: {label:'Governance',               docs:[{name:'Governance', desc:'', url:''}]},
+    }
+  },
+  marketing: {
+    label:'Marketing', icon:'🎨',
+    subs:{
+      templates:{label:'Templates', docs:[{name:'Templates corporativos', desc:'', url:''}]},
+    }
+  },
+};
+
+// ── DOCS RENDER ───────────────────────────────────────────────────
+function renderDocs(path) {
+  docsNav_ = path || null;
+  const parts = docsNav_ ? docsNav_.split('/') : [];
+
+  // Breadcrumb + back button
+  let breadcrumb = `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:20px">
+    <span onclick="renderDocs(null)" style="cursor:pointer;color:var(--blue);font-weight:600;font-size:13px">Portal documentos</span>`;
+  let node = DOCS_TREE;
+  let pathSoFar = '';
+  parts.forEach((p,i) => {
+    breadcrumb += `<span style="color:var(--gray-400)">›</span>`;
+    node = node[p] || (node.subs && node.subs[p]);
+    pathSoFar = parts.slice(0,i+1).join('/');
+    const label = node ? (node.label||p) : p;
+    if(i < parts.length-1) {
+      breadcrumb += `<span onclick="renderDocs('${pathSoFar}')" style="cursor:pointer;color:var(--blue);font-size:13px">${label}</span>`;
+    } else {
+      breadcrumb += `<span style="color:var(--gray-700,#444);font-size:13px;font-weight:500">${label}</span>`;
+    }
+  });
+  if(parts.length>0) {
+    const backPath = parts.length>1 ? parts.slice(0,-1).join('/') : null;
+    breadcrumb += `<button onclick="renderDocs(${backPath?`'${backPath}'`:'null'})"
+      style="margin-left:auto;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--gray-600);font-size:12px;cursor:pointer;font-weight:500">
+      ← Volver</button>`;
+  }
+  breadcrumb += `</div>`;
+
+  let content = '';
+
+  // LEVEL 0: home — show category cards
+  if(parts.length === 0) {
+    content = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      ${Object.entries(DOCS_TREE).map(([k,cat])=>`
+        <div onclick="renderDocs('${k}')" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;cursor:pointer;text-align:center;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s"
+          onmouseover="this.style.borderColor='#185FA5';this.style.boxShadow='0 4px 14px rgba(0,0,0,0.1)'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='var(--shadow)'">
+          <div style="font-size:28px;margin-bottom:10px">${cat.icon}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900)">${cat.label}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${Object.keys(cat.subs).length} secciones</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // LEVEL 1: category — show sub-cards
+  else if(parts.length === 1) {
+    const cat = DOCS_TREE[parts[0]];
+    if(!cat){content='<div class="docs-empty">Sección no encontrada</div>';}
+    else {
+      // Special: fondos shows fund cards
+      if(parts[0]==='fondos') {
+        content = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          ${Object.entries(cat.subs).map(([k,fund])=>`
+            <div onclick="renderDocs('fondos/${k}')" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s"
+              onmouseover="this.style.borderColor='${fund.color||'#185FA5'}'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="width:10px;height:10px;border-radius:50%;background:${fund.color||'#185FA5'};flex-shrink:0"></span>
+                <span style="font-size:15px;font-weight:700">${fund.label}</span>
+              </div>
+              <div style="font-size:12px;color:var(--gray-400)">${Object.keys(fund.subs||{}).length} secciones disponibles</div>
+            </div>`).join('')}
+        </div>`;
+      } else {
+        content = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          ${Object.entries(cat.subs).map(([k,sub])=>`
+            <div onclick="renderDocs('${parts[0]}/${k}')" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s"
+              onmouseover="this.style.borderColor='#185FA5'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:6px">${sub.label}</div>
+              ${sub.latest?`<div style="font-size:12px;color:var(--success)">● Último: ${sub.latest.name.substring(0,35)}${sub.latest.name.length>35?'…':''}</div>`:''}
+              ${sub.docs?`<div style="font-size:12px;color:var(--gray-400)">${sub.docs.length} documentos</div>`:''}
+              ${sub.entities?`<div style="font-size:12px;color:var(--gray-400)">${sub.entities.length} entidades</div>`:''}
+              ${sub.subs?`<div style="font-size:12px;color:var(--gray-400)">${Object.keys(sub.subs).length} secciones</div>`:''}
+            </div>`).join('')}
+        </div>`;
+      }
+    }
+  }
+
+  // LEVEL 2: fondos/fondo — show fund sections
+  else if(parts.length === 2 && parts[0]==='fondos') {
+    const fund = DOCS_TREE.fondos.subs[parts[1]];
+    if(!fund){content='<div class="docs-empty">Fondo no encontrado</div>';}
+    else {
+      content = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        ${Object.entries(fund.subs||{}).map(([k,sec])=>`
+          <div onclick="renderDocs('fondos/${parts[1]}/${k}')" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s"
+            onmouseover="this.style.borderColor='${fund.color||'#185FA5'}'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:14px;font-weight:600;margin-bottom:6px">${sec.label}</div>
+            ${sec.docs?`<div style="font-size:12px;color:var(--gray-400)">${sec.docs.length} documentos</div>`:''}
+            ${sec.entities?`<div style="font-size:12px;color:var(--gray-400)">${sec.entities.length} entidades</div>`:''}
+          </div>`).join('')}
+      </div>`;
+    }
+  }
+
+  // LEVEL 2 (non-fondos) or LEVEL 3 (fondos): show documents
+  else {
+    let sub;
+    if(parts[0]==='fondos' && parts.length===3) {
+      sub = (DOCS_TREE.fondos.subs[parts[1]]||{}).subs?.[parts[2]];
+    } else if(parts[0]==='fondos' && parts.length===4) {
+      sub = ((DOCS_TREE.fondos.subs[parts[1]]||{}).subs?.[parts[2]]||{}).subs?.[parts[3]];
+    } else if(parts.length === 3 && parts[0] !== 'fondos') {
+      sub = DOCS_TREE[parts[0]]?.subs?.[parts[1]]?.subs?.[parts[2]];
+    } else {
+      sub = DOCS_TREE[parts[0]]?.subs?.[parts[1]];
+    }
+
+    // If sub has nested subs, show cards (4th level)
+    if(sub && sub.subs) {
+      content = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        ${Object.entries(sub.subs).map(([k,s])=>`
+          <div onclick="renderDocs('${parts.join('/')}/${k}')" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s"
+            onmouseover="this.style.borderColor='#185FA5'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:6px">${s.label}</div>
+            ${s.latest?`<div style="font-size:12px;color:var(--success)">● ${s.latest.name.substring(0,40)}${s.latest.name.length>40?'…':''}</div>`:''}
+            ${s.docs?`<div style="font-size:12px;color:var(--gray-400)">${s.docs.length} documentos</div>`:''}
+          </div>`).join('')}
+      </div>`;
+    } else if(!sub){content='<div class="docs-empty">Sección no encontrada</div>';}
+    else if(sub.latest||sub.historico) {
+      // Document list with latest + historico
+      content = `<div class="docs-group">`;
+      if(sub.latest) {
+        content += `<div class="docs-latest">
+          <div><div class="docs-latest-label">Último disponible</div><div class="docs-latest-name">${sub.latest.name}</div></div>
+          <a href="${sub.latest.url}" target="_blank" class="docs-open-btn">📥 Abrir</a>
+        </div>`;
+      }
+      if(sub.historico && sub.historico.length>0) {
+        const hid='dh_'+parts.join('_');
+        content += `<div class="docs-hist-toggle" onclick="toggleHist('${hid}')">▶ Ver histórico (${sub.historico.length} documentos)</div>
+        <div class="docs-hist" id="${hid}">
+          <div class="card" style="padding:0">
+            ${sub.historico.map(d=>`<div class="docs-hist-row" style="padding:8px 16px">
+              <span class="docs-hist-name">${d.name}</span>
+              <a href="${d.url}" target="_blank" class="docs-hist-link">📥 Abrir</a>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }
+      content += `</div>`;
+    } else if(sub.docs) {
+      content = `<div class="card"><table>
+        <thead><tr><th>Documento</th><th>Descripción</th><th></th></tr></thead>
+        <tbody>${sub.docs.map(d=>`<tr>
+          <td style="font-weight:500">${d.name}</td>
+          <td style="color:var(--gray-400);font-size:12px">${d.desc||'—'}</td>
+          <td>${d.url?`<a href="${d.url}" target="_blank" class="docs-hist-link">📥 Abrir</a>`:'<span style="font-size:11px;color:var(--gray-400)">Link pendiente</span>'}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    } else if(sub.entities) {
+      content = `<div class="docs-grid">
+        ${sub.entities.map((ent,ei)=>`<div class="docs-entity-card">
+          <div class="docs-entity-title">${ent.name}</div>
+          ${ent.latest?`<div class="docs-latest" style="padding:10px 14px;margin-bottom:8px">
+            <div><div class="docs-latest-label">Último</div><div class="docs-latest-name" style="font-size:12px">${ent.latest.name}</div></div>
+            <a href="${ent.latest.url}" target="_blank" class="docs-open-btn" style="padding:5px 10px;font-size:11px">📥 Abrir</a>
+          </div>`:''}
+          ${ent.historico&&ent.historico.length>0?`
+            <div class="docs-hist-toggle" onclick="toggleHist('dent_${ei}_${parts.join('_')}')">▶ Histórico (${ent.historico.length})</div>
+            <div class="docs-hist" id="dent_${ei}_${parts.join('_')}">
+              ${ent.historico.map(d=>`<div class="docs-hist-row"><span class="docs-hist-name">${d.name}</span><a href="${d.url}" target="_blank" class="docs-hist-link">📥 Abrir</a></div>`).join('')}
+            </div>`:''
+          }
+        </div>`).join('')}
+      </div>`;
+    }
+  }
+
+  document.getElementById('docsNav').innerHTML = breadcrumb;
+  document.getElementById('docsContent').innerHTML = content;
+}
+
+function toggleHist(id) {
+  const el = document.getElementById(id);
+  const toggle = el.previousElementSibling;
+  if(el.classList.contains('open')) {
+    el.classList.remove('open');
+    toggle.textContent = toggle.textContent.replace('▼','▶');
+  } else {
+    el.classList.add('open');
+    toggle.textContent = toggle.textContent.replace('▶','▼');
+  }
+}
+
+
+
+// ── TRIANA TABLE FILTER & SORT ────────────────────────────────────
+function filterTrianaTable(){
+  const text = (document.getElementById('trianaFilter')?.value||'').toLowerCase();
+  const sector = document.getElementById('trianaSectorFilter')?.value||'';
+  const sort = document.getElementById('trianaSort')?.value||'curr_desc';
+  const tbody = document.getElementById('trianaTableBody');
+  if(!tbody) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  // Filter
+  let visible = rows.filter(r=>{
+    const issuerMatch = r.dataset.issuer.includes(text)||r.dataset.sector.toLowerCase().includes(text);
+    const sectorMatch = !sector || r.dataset.sector===sector;
+    return issuerMatch && sectorMatch;
+  });
+
+  // Sort
+  visible.sort((a,b)=>{
+    if(sort==='curr_desc') return parseFloat(b.dataset.curr)-parseFloat(a.dataset.curr);
+    if(sort==='curr_asc')  return parseFloat(a.dataset.curr)-parseFloat(b.dataset.curr);
+    if(sort==='orig_desc') return parseFloat(b.dataset.orig)-parseFloat(a.dataset.orig);
+    if(sort==='issuer_asc') return a.dataset.issuer.localeCompare(b.dataset.issuer);
+    if(sort==='maturity_asc') return (a.dataset.maturity||'').localeCompare(b.dataset.maturity||'');
+    return 0;
+  });
+
+  // Hide all, then show sorted visible
+  rows.forEach(r=>r.style.display='none');
+  visible.forEach(r=>r.style.display='');
+
+  // Reorder DOM
+  visible.forEach(r=>tbody.appendChild(r));
+
+  // Update count
+  const countEl = document.getElementById('trianaCount');
+  if(countEl) countEl.textContent = visible.length+' de '+rows.length+' posiciones';
+}
+
+
+// ── MOBILE MENU ───────────────────────────────────────────────────
+function toggleMobMenu(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('mobOverlay');
+  const ham = document.getElementById('mobHam');
+  const isOpen = sidebar.classList.contains('mob-open');
+  if(isOpen){
+    sidebar.classList.remove('mob-open');
+    overlay.classList.remove('open');
+    ham.classList.remove('open');
+  } else {
+    sidebar.classList.add('mob-open');
+    overlay.classList.add('open');
+    ham.classList.add('open');
+  }
+}
+function closeMobMenu(){
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('mobOverlay').classList.remove('open');
+  const ham = document.getElementById('mobHam');
+  if(ham) ham.classList.remove('open');
+}
+// Close menu on nav item click (mobile)
+document.addEventListener('DOMContentLoaded',()=>{
+  // Close sidebar on any nav click in mobile
+  document.querySelectorAll('.sidebar-item').forEach(el=>{
+    el.addEventListener('click',()=>{ if(window.innerWidth<=768) closeMobMenu(); });
+  });
+  // Close on overlay click
+  const ov = document.getElementById('mobOverlay');
+  if(ov) ov.addEventListener('click', closeMobMenu);
+  // Sync mobile date label
+  const sf=document.getElementById('sidebarFooter');
+  const md=document.getElementById('mobDate');
+  if(sf&&md){
+    const obs=new MutationObserver(()=>{ md.textContent=sf.textContent; });
+    obs.observe(sf,{childList:true,characterData:true,subtree:true});
+    md.textContent = sf.textContent;
+  }
+});
+
+
+// ── STAGING MODE ──────────────────────────────────────────────────
+(function(){
+  const isStaging = window.location.search.includes('staging=1') ||
+                    window.location.hostname.includes('staging') ||
+                    localStorage.getItem('zintra_staging') === '1';
+  if(isStaging){
+    document.getElementById('stagingBanner').classList.add('visible');
+    document.body.classList.add('staging');
+    if(window.location.search.includes('staging=1'))
+      localStorage.setItem('zintra_staging','1');
+  }
+})();
+
+renderOverview();
+
+
+// ── TRIANA DATATAPE HANDLER ───────────────────────────────────────
+function showUploadError(msg, type){
+  type = type || 'budget';
+  const s=document.getElementById(type+'Success');
+  const er=document.getElementById(type+'Error');
+  if(er){ er.style.display='block'; er.textContent='⚠ '+msg; }
+  if(s) s.style.display='none';
+}
+
+</script>
+</body>
+</html>

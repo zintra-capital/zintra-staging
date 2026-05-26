@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestora · Acceso</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#1A3A5C;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .card{background:#fff;border-radius:16px;padding:44px 48px;width:360px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.25);}
+  .lock{font-size:36px;margin-bottom:10px;}
+  .title{font-size:20px;font-weight:700;color:#1A3A5C;margin-bottom:4px;}
+  .sub{font-size:13px;color:#999;margin-bottom:28px;}
+  input{width:100%;padding:12px 14px;border:1.5px solid #E0E0E0;border-radius:8px;font-size:14px;outline:none;transition:border-color .15s;}
+  input:focus{border-color:#1A3A5C;}
+  input.error{border-color:#E74C3C;}
+  .err-msg{color:#E74C3C;font-size:12px;min-height:18px;margin:8px 0;}
+  button{width:100%;padding:12px;background:#1A3A5C;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:background .15s;}
+  button:hover{background:#2E6DA4;}
+  .footer{font-size:11px;color:#ccc;margin-top:20px;}
+  .dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="dots">
+    <div class="dot" style="background:#185FA5"></div>
+    <div class="dot" style="background:#534AB7"></div>
+    <div class="dot" style="background:#3B6D11"></div>
+  </div>
+  <div class="title">Zintra Capital · Reporting</div>
+  <div class="sub">Fondos de Deuda &nbsp;·&nbsp; Acceso restringido</div>
+  <input id="pwd" type="password" placeholder="Contraseña" autofocus />
+  <div class="err-msg" id="err"></div>
+  <button onclick="check()">Entrar &rarr;</button>
+  <div class="footer">Zintra Capital &nbsp;·&nbsp; Confidencial</div>
+</div>
+<script>
+  // La contraseña se hashea para que no sea visible en texto plano
+  async function sha256(msg){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  const HASH = "0d918c037df370790844eacb5bca9bcf513c88e7fa02127f03be77e1463ed7ee";
+
+  document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') check(); });
+
+  async function check(){
+    const val = document.getElementById('pwd').value;
+    const h   = await sha256(val);
+    if(h === HASH){
+      sessionStorage.setItem('gestora_ok','1');
+      window.location.href = './dashboard.html';
+    } else {
+      const inp = document.getElementById('pwd');
+      const err = document.getElementById('err');
+      inp.classList.add('error');
+      err.textContent = 'Contraseña incorrecta';
+      inp.value = '';
+      inp.focus();
+      setTimeout(()=>{ inp.classList.remove('error'); err.textContent=''; }, 2500);
+    }
+  }
+</script>
+</body>
+</html>
