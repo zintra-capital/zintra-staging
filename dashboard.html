@@ -752,8 +752,13 @@ function renderBudgetFund(id){
   <div class="card">
     <div class="card-title">${f.name} — <span class="badge" style="background:${bg};color:${tc}">${f.tipoLabel}</span> &nbsp; Real vs budget 2026 (€k salvo AUM en €M)</div>
     <div class="tbl-wrap"><table>${TH}<tbody>
-      <tr><td style="font-weight:600">AUM (€M)</td><td>—</td><td>—</td><td style="font-weight:700">${f.aum.real.toFixed(1)}</td>
-        <td style="color:var(--gray-400)">—</td><td style="color:var(--gray-400)">—</td><td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
+      <tr><td style="font-weight:600">AUM (€M)</td>
+        <td>${f.aum.acReal!=null?f.aum.acReal.toFixed(1):'—'}</td>
+        <td>${f.aum.mesReal!=null?f.aum.mesReal.toFixed(1):'—'}</td>
+        <td style="font-weight:700">${f.aum.acReal!=null?(f.aum.acReal+(f.aum.mesReal||0)).toFixed(1):f.aum.real.toFixed(1)}</td>
+        <td style="color:var(--gray-400)">${f.aum.acBudg!=null?f.aum.acBudg.toFixed(1):'—'}</td>
+        <td style="color:var(--gray-400)">${f.aum.mesBudg!=null?f.aum.mesBudg.toFixed(1):'—'}</td>
+        <td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
         <td class="${vc(f.aum.varEur)}">${f.aum.varEur>=0?'+':''}${f.aum.varEur.toFixed(1)}</td><td>${vp(f.aum.varPct)}</td></tr>
       ${id==='alcantara'&&f.progFirmados?`<tr><td style="font-weight:600">Imp. prog. firmados (€M)</td><td>${f.progFirmados.acReal!=null?f.progFirmados.acReal.toFixed(1):"—"}</td><td>${f.progFirmados.mesReal!=null?f.progFirmados.mesReal.toFixed(1):"—"}</td><td style="font-weight:700">${f.progFirmados.real.toFixed(1)}</td>
         <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):"—"}</td><td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
@@ -785,9 +790,9 @@ function renderBudgetFund(id){
     </div>`;
     setTimeout(()=>{
       const ac=document.getElementById('budgetAumChart');
-      if(ac){dc('bdgAum');charts.bdgAum=new Chart(ac,{type:'bar',data:{labels:meses,datasets:[{label:'Budget',data:fd.aum.budget,type:'line',borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#185FA5'},{label:'Real',data:fd.aum.real,backgroundColor:'#185FA5',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?'€'+v+'Mn':'',font:{size:10}}}}}});}
+      if(ac){dc('bdgAum');charts.bdgAum=new Chart(ac,{type:'bar',data:{labels:meses,datasets:[{label:'Real',data:fd.aum.real,backgroundColor:'#185FA5',borderWidth:0,borderRadius:3},{label:'Budget',data:fd.aum.budget,type:'line',borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointHoverRadius:5,pointBackgroundColor:'#fff',pointBorderColor:'#185FA5',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?'€'+v+'Mn':'',font:{size:10}}}}}});}
       const ic=document.getElementById('budgetIngChart');
-      if(ic){dc('bdgIng');charts.bdgIng=new Chart(ic,{type:'bar',data:{labels:meses,datasets:[{label:'Budget',data:fd.ingresos.budget,type:'line',borderColor:'#3B6D11',backgroundColor:'rgba(59,109,17,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#3B6D11'},{label:'Real',data:fd.ingresos.real,backgroundColor:'#3B6D11',borderWidth:0,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?v+'k':'',font:{size:10}}}}}});}
+      if(ic){dc('bdgIng');charts.bdgIng=new Chart(ic,{type:'bar',data:{labels:meses,datasets:[{label:'Real',data:fd.ingresos.real,backgroundColor:'#3B6D11',borderWidth:0,borderRadius:3},{label:'Budget',data:fd.ingresos.budget,type:'line',borderColor:'#3B6D11',backgroundColor:'rgba(59,109,17,0.1)',borderWidth:2,tension:0.3,fill:false,pointRadius:4,pointHoverRadius:5,pointBackgroundColor:'#fff',pointBorderColor:'#3B6D11',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top'}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{callback:v=>v!=null?v+'k':'',font:{size:10}}}}}});}
     },150);
   }
 }
