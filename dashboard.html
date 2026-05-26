@@ -814,43 +814,7 @@ function renderFund(id){
       </div>
       <div style="font-size:12px;color:var(--gray-600);margin-top:6px;max-width:600px">${f.estrategia}</div>
     </div>
-  </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card"><div class="kpi-label">AUM real (abr)</div><div class="kpi-value">${f.aum.acReal!=null?fM(f.aum.acReal):fM(f.aum.real)}</div><div class="kpi-sub ${vc(f.aum.varPct)}">vs ${f.aum.acBudg!=null?fM(f.aum.acBudg):fM(f.aum.budget)} budget</div></div>
-    <div class="kpi-card"><div class="kpi-label">Ingresos ac. abril</div><div class="kpi-value">${fK(f.ingresos.acReal)}</div><div class="kpi-sub ${vc(f.ingresos.varPct)}">vs ${fK(f.ingresos.acBudg)} budget · ${f.ingresos.varPct>0?'+':''}${f.ingresos.varPct}%</div></div>
-    <div class="kpi-card"><div class="kpi-label">Gastos ac. abril</div><div class="kpi-value">${f.gastos.acReal!=null&&f.gastos.acReal!==0?fK(Math.abs(f.gastos.acReal)):'—'}</div><div class="kpi-sub neu">${f.gastos.acBudg!=null&&f.gastos.acBudg!==0?'Budget '+fK(Math.abs(f.gastos.acBudg)):'Sin gastos asignados'}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Ing. netos ac. abril</div><div class="kpi-value">${fK(f.ingNetos.acReal)}</div><div class="kpi-sub ${vc(f.ingNetos.varPct)}">vs ${fK(f.ingNetos.acBudg)} budget · ${f.ingNetos.varPct>0?'+':''}${f.ingNetos.varPct}%</div></div>
-  </div>
-
-  <div class="sec-title">Real vs budget</div>
-  <div class="card" style="margin-bottom:20px"><div class="tbl-wrap"><table>
-    <thead><tr><th></th><th>Ac. abril real</th><th>Mayo est.</th><th>YTD est.</th><th>Ac. abr. budget</th><th>Mayo budget</th><th>YTD budget</th><th>Var. €</th><th>Var. %</th></tr></thead>
-    <tbody>
-      <tr><td style="font-weight:600">AUM (€M)</td>
-      <td>${f.aum.acReal!=null?f.aum.acReal.toFixed(1):'—'}</td>
-      <td>${f.aum.mesReal!=null?f.aum.mesReal.toFixed(1):'—'}</td>
-      <td style="font-weight:700">${f.aum.real.toFixed(1)}</td>
-      <td style="color:var(--gray-400)">${f.aum.acBudg!=null?f.aum.acBudg.toFixed(1):'—'}</td>
-      <td style="color:var(--gray-400)">${f.aum.mesBudg!=null?f.aum.mesBudg.toFixed(1):'—'}</td>
-      <td style="color:var(--gray-400)">${f.aum.budget.toFixed(1)}</td>
-      <td class="${vc(f.aum.varEur)}">${f.aum.varEur>=0?'+':''}${f.aum.varEur.toFixed(1)}</td>
-      <td>${vp(f.aum.varPct)}</td></tr>
-      ${id==='alcantara'&&f.progFirmados?`<tr><td style="font-weight:600">Imp. prog. firmados (€M)</td>
-      <td>${f.progFirmados.acReal!=null?f.progFirmados.acReal.toFixed(1):'—'}</td>
-      <td>${f.progFirmados.mesReal!=null?f.progFirmados.mesReal.toFixed(1):'—'}</td>
-      <td style="font-weight:700">${f.progFirmados.real.toFixed(1)}</td>
-      <td style="color:var(--gray-400)">${f.progFirmados.acBudg!=null?f.progFirmados.acBudg.toFixed(1):'—'}</td>
-      <td style="color:var(--gray-400)">${f.progFirmados.mesBudg!=null?f.progFirmados.mesBudg.toFixed(1):'—'}</td>
-      <td style="color:var(--gray-400)">${f.progFirmados.budget.toFixed(1)}</td>
-      <td class="${vc(f.progFirmados.varEur)}">${f.progFirmados.varEur>=0?'+':''}${f.progFirmados.varEur.toFixed(1)}</td>
-      <td>${vp(f.progFirmados.varPct)}</td></tr>`:''}
-      <tr><td style="font-weight:600">Ingresos (€k)</td><td>${f.ingresos.acReal!=null?fK(f.ingresos.acReal):'—'}</td><td>${f.ingresos.mesReal!=null?fK(f.ingresos.mesReal):'—'}</td><td style="font-weight:700">${f.ingresos.ytdReal.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.acBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.mesBudg.toFixed(1)}</td><td style="color:var(--gray-400)">${f.ingresos.ytdBudg.toFixed(1)}</td><td class="${vc(f.ingresos.varEur)}">${f.ingresos.varEur>=0?'+':''}${f.ingresos.varEur.toFixed(1)}</td><td>${vp(f.ingresos.varPct)}</td></tr>
-      ${f.gastos.ytdReal>0||f.gastos.ytdBudg>0?`<tr><td style="font-weight:600">Gastos (€k)</td><td>${f.gastos.acReal>0?'('+f.gastos.acReal.toFixed(1)+')':'—'}</td><td>${f.gastos.mesReal>0?'('+f.gastos.mesReal.toFixed(1)+')':'—'}</td><td style="font-weight:700">${f.gastos.ytdReal>0?'('+f.gastos.ytdReal.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.acBudg>0?'('+f.gastos.acBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.mesBudg>0?'('+f.gastos.mesBudg.toFixed(1)+')':'—'}</td><td style="color:var(--gray-400)">${f.gastos.ytdBudg>0?'('+f.gastos.ytdBudg.toFixed(1)+')':'—'}</td><td></td><td></td></tr>`:''}
-      <tr class="total-row"><td>Ingresos netos (€k)</td><td>${f.ingNetos.acReal.toFixed(1)}</td><td>${f.ingNetos.mesReal.toFixed(1)}</td><td>${f.ingNetos.ytdReal.toFixed(1)}</td><td>${f.ingNetos.acBudg.toFixed(1)}</td><td>${f.ingNetos.mesBudg.toFixed(1)}</td><td>${f.ingNetos.ytdBudg.toFixed(1)}</td><td class="${vc(f.ingNetos.varEur)}">${f.ingNetos.varEur>=0?'+':''}${f.ingNetos.varEur.toFixed(1)}</td><td>${vp(f.ingNetos.varPct)}</td></tr>
-    </tbody>
-  </table></div>${f.nota?`<div class="nota">&#9888;&nbsp;${f.nota}</div>`:''}</div>`;
-
+  </div>`;
   if(id==='triana'){
     html += renderTrianaPortfolio();
   } else if(id==='alcantara'){
